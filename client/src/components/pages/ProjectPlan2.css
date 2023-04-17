@@ -1,0 +1,21 @@
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+/* try removing the "hack" below to see how the table overflows the .body */
+.hack1 {
+  display: table;
+  table-layout: fixed;
+  width: 100%;
+}
+
+.hack2 {
+  display: table-cell;
+  overflow-x: auto;
+  width: 100%;
+}
+.scroll{
+  overflow-x: auto;
+  white-space: nowrap;
+}

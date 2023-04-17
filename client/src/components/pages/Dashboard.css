@@ -1,0 +1,22 @@
+.icon i{
+  
+    color:#fbc658!important;
+}
+.small-box .icon>i{
+    font-size: 40px;
+    top:20px;
+    right:20px
+}
+.small-box-footer i{
+    margin-left: 10px;
+    margin-right: 10px;
+    color: black;
+}
+.small-box{
+    margin: 0px;
+    
+}
+.small-box>.small-box-footer {
+    background-color: white;
+    color: black;
+}
