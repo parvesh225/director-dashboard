@@ -76,7 +76,6 @@ class ProjectPlan extends Component {
   componentDidMount() {
     axios.get(process.env.REACT_APP_BASE_URL + "/api/admin/fetch-master-data")
     .then((response)=> {
-      console.log(response.data);
       var centre_name= this.state.singleFields.centre_name;
       var centre = response.data.centres
       var project = response.data.projects
@@ -777,7 +776,7 @@ submitForm() {
                                   type="text"
                                   className="form-control"
                                   id="other_activity"
-                                  placeholder="Team strength"
+                                  placeholder="Other Activity"
                                   name="other_activity"
                                   onChange={ (evnt) =>this.handleChangeMul(idx,evnt,"other_activities") }
                                   value={item.other_activity}

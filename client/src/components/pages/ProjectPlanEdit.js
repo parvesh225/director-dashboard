@@ -11,6 +11,11 @@ class ProjectPlanEdit extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      centre: [],
+      project: [], 
+      project_head: [],
+      funding_agency: [],
+
       singleFields: {
         id:"",
         centre_name: "",
@@ -39,9 +44,7 @@ class ProjectPlanEdit extends Component {
           salary_slab: "",
         },
       ],
-      finances: [
-        
-      ],
+      finances: [],
       project_activities: [
         {
           type: "",
@@ -232,10 +235,13 @@ submitForm() {
     // console.log('Props:', this.props.params.id);
     axios.get(process.env.REACT_APP_BASE_URL + "/api/admin/project-plan/"+this.props.params.id)
     .then((response)=> {
-    console.log(response.data)
     this.setState({
       singleFields: response.data.data,
       years: response.data.years,
+      centre: response.data.centres,
+      project: response.data.projects,
+      project_head: response.data.team_leader,
+      funding_agency: response.data.agencys,
     })
 
     var financeesList = [];
@@ -306,7 +312,25 @@ submitForm() {
     var yearsSelectOption = this.state.years.map(function (year, index) {
       return <option   key={year} value={year}>{year}</option>;
   })
+
+  let centre = this.state.centre.map(function (center, index) {
+      
+    return <option   key={center.id} value={center.centre_code} >{center.centre_name}</option>;
+})
+  let project = this.state.project.map(function (project, index) {
+    return <option key={project.id}  value={project.project_code}> {project.project_name} </option>;
+
+})
+
+  let team = this.state.project_head.map(function(team, index) {
+    return <option key={team.id} value={team.employee_code}> {team.employee_name} </option>
+  })
+
+  let agency = this.state.funding_agency.map(function(agency, index) {
+    return <option key={agency.id} value={agency.funding_agency_code}>  {agency.funding_agency_name	} </option>
+  })
     return (
+      
       <>
         <Header />
         <Sidebar />
@@ -326,28 +350,33 @@ submitForm() {
                           <div className="col-md-6">
                             <div className="form-group">
                               <label htmlFor="centreName">Centre Name </label>
-                              <input
-                                type="text"
-                                className="form-control"
-                                id="centre_name"
-                                readOnly
+                              
+                              <select
+                                class="form-control "
                                 name="centre_name"
+                                id="centre_name"
                                 value={this.state.singleFields.centre_name}
-
-                              />
+                                readOnly
+                              >
+                                <option> select </option>
+                                {centre}
+                              </select>
                             </div>
                           </div>
                           <div className="col-md-6">
                             <div className="form-group">
                               <label htmlFor="projectName">Project Name</label>
-                              <input
-                                type="text"
-                                className="form-control"
-                                id="project_name"
-                                readOnly
+                              
+                               <select
+                                class="form-control "
                                 name="project_name"
+                                id="project_name"
                                 value={this.state.singleFields.project_name}
-                              />
+                                readOnly
+                              >
+                                <option selected="selected"> select </option>
+                                {project}
+                              </select>
                             </div>
                           </div>
                         </div>
@@ -357,13 +386,17 @@ submitForm() {
                               <label htmlFor="projectHeadName">
                                 Project Head Name
                               </label>
-                              <input
-                                type="text"
+                             
+                               <select
+                                class="form-control "
+                                name="team_head"
+                                id="team_head"
+                                value={this.state.singleFields.project_head}
                                 readOnly
-                                className="form-control"
-                                id="project_head"
-                                name="project_head" value={this.state.singleFields.project_head}
-                              />
+                                >
+                                <option selected="selected"> select </option>
+                                {team}
+                              </select>
                             </div>
                           </div>
 
@@ -371,13 +404,17 @@ submitForm() {
                             <label for="fundingMinistry/Agency/Dept">
                               Funding Ministry/Agency/Dept.
                             </label>
-                            <input
-                              type="text"
-                              className="form-control"
-                              id="funding_agency"
-                              readOnly
-                              name="funding_agency" value={this.state.singleFields.funding_agency}
-                            />
+                           
+                             <select
+                              class="form-control "
+                              name="funding_ministry"
+                              id="funding_ministry"
+                              value={this.state.singleFields.funding_agency}
+                             readOnly
+                            >
+                              <option selected="selected"> select </option>
+                              {agency}
+                            </select>
                           </div>
                         </div>
                         <div className="row ">

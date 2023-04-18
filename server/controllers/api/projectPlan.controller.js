@@ -236,6 +236,8 @@ async function fetchProjectPlan(req, res, next) {
       where: { project_plan_id: `${project.id}` }
     });
 
+
+
     //Project Activity
     let project_activity = await ProjectActivitie.findAll({
       where: { project_plan_id: `${project.id}` }
@@ -245,6 +247,13 @@ async function fetchProjectPlan(req, res, next) {
       where: { project_plan_id: `${project.id}` }
     });
 
+    //Get Master data
+    const centres = await Centre.findAll();
+    const projects = await Project.findAll();
+    const team_leader = await TeamLeader.findAll();
+    const agencys = await FundingAgency.findAll();
+  //End Get Master data
+
     // Success Message Return
     return res.status(200).json({
       status: true,
@@ -252,7 +261,12 @@ async function fetchProjectPlan(req, res, next) {
       years: years,
       teams: teams,
       projectActivity: project_activity,
-      otherActivity: other_activity
+      otherActivity: other_activity,
+      centres: centres,
+      projects: projects,
+      team_leader: team_leader,
+      agencys: agencys
+
     });
 
   } catch (error) {
@@ -267,13 +281,28 @@ async function fetchProjectPlan(req, res, next) {
 
 }
 async function projectPlanList(req, res, next) {
-  ProjectPlan.findAll().
-      then((data) => {
-          res.send(data);
+    try {
+      let dataList= await ProjectPlan.findAll();
+      const centres = await Centre.findAll();
+      const projects = await Project.findAll();
+      const team = await TeamLeader.findAll();
+      const agencys = await FundingAgency.findAll();
+      // Success Message Return
+    return res.status(200).json({
+          status: true,
+          data: dataList,
+          centres: centres,
+          projects: projects,
+          teams: team,
+          agencys: agencys
+
+    });
+    } catch(error) {
+      return res.status(501).json({
+        status: false,
+        message: error.message
       })
-      .catch((error) => {
-          console.log(error);
-      });
+    }
 }
 
 async function fetchProjectPlanFinances(req, res, next) {
