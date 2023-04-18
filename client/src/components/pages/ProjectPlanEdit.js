@@ -283,8 +283,8 @@ submitForm() {
       var item = response.data.otherActivity[i]
       financeesList.push({
         id:   item.id,
-        activites: item.activites,
-        date: item.date,
+        other_activity: item.activities,
+        other_date: item.date,
         status: item.status
       })
     }
