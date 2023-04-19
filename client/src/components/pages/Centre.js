@@ -10,7 +10,8 @@ class Centre extends Component {
         this.state = {
             Centre: {
                 centre_code: "",
-                centre_name: ""
+                centre_name: "",
+                short_name :"",
             },
             resStatus: {
                 isError: false,
@@ -63,7 +64,8 @@ class Centre extends Component {
                 var centre = thizz.state.Centre
                 centre = {
                     centre_code :'',
-                    centre_name :''
+                    centre_name :'',
+                    short_name  :""
                 }
                 thizz.setState({
                     Centre:centre
@@ -87,7 +89,7 @@ class Centre extends Component {
         return (
             <>
                 <Header />
-                <Sidebar />
+                <Sidebar /> 
                 <div className="content-wrapper">
                     {/* Content Header (Page header) */}
                     <div className="content-header">
@@ -108,6 +110,10 @@ class Centre extends Component {
                                                 <div className="form-group">
                                                     <label htmlFor="centre_name">Centre Name</label>
                                                     <input type="text" name="centre_name" value={this.state.Centre.centre_name} onChange={this.handleChange} className="form-control" id="centre_name" />
+                                                </div>
+                                                <div className="form-group">
+                                                    <label htmlFor="short_name">Short Name</label>
+                                                    <input type="text" name="short_name" value={this.state.Centre.short_name} onChange={this.handleChange} className="form-control" id="centre_name" />
                                                 </div>
 
                                             </div>

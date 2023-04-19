@@ -11,11 +11,11 @@ FundingAgency.init({
         primaryKey: true,
         allowNull: false
       },
-      funding_agency_code: {
+      agency_code: {
       type: DataTypes.STRING,
       allowNull: false
     },
-    funding_agency_name: {
+    agency_name: {
       type: DataTypes.STRING,
       allowNull: false
     },

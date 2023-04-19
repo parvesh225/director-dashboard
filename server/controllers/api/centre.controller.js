@@ -4,17 +4,18 @@ const { Centre } = require("../../models/Centre");
 async function insert(req, res) {
 console.log(req.body);
     try {
-        const { centre_code, centre_name } = req.body;
+        const { centre_code, centre_name, short_name } = req.body;
         // console.log(centreCode, centreName);
         //Centre code and Centre name is required
-        if (!centre_code || !centre_name) {
-            throw new Error("Centre code and Centre name is required");
+        if (!centre_code || !centre_name || !short_name) {
+            throw new Error("All fields are required");
         }
 
         // Create Centre
         let centre = await Centre.create({
             centre_code: centre_code,
             centre_name: centre_name,
+            short_name: short_name,
         });
 
 

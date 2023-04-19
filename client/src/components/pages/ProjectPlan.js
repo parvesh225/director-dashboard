@@ -261,7 +261,7 @@ submitForm() {
     })
 
     let agency = this.state.funding_agency.map(function(agency, index) {
-      return <option key={agency.id} value={agency.funding_agency_code}>  {agency.funding_agency_name	} </option>
+      return <option key={agency.id} value={agency.agency_code}>  {agency.agency_name	} </option>
     })
     return (
       <>
@@ -478,6 +478,7 @@ submitForm() {
                         <table className="table">
                           <thead className="thead-dark">
                             <tr>
+                              <th>S.No</th>
                               <th>Team Strength</th>
                               <th>Position</th>
                               <th>Experience</th>
@@ -489,6 +490,7 @@ submitForm() {
                           <tbody id="tbl">
                             {this.state.team_strength.map((item, idx) => (
                               <tr key={"ts-" + idx}>
+                                <td>{idx +1}</td>
                                 <td>
                                   <input
                                     type="text"

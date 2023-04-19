@@ -1,16 +1,15 @@
 const { Project } = require("../../models/Project");
 
-// Add New Centre 
+// Add New Project 
 async function insert(req, res) {
 
     try {
         const { project_code, project_name } = req.body;
         if (!project_code || !project_name) {
-            throw new Error("Project code and project name is required");
+            throw new Error("Project code and  name is required");
         }
 
-        // Create Centre
-        let centre = await Project.create({
+        let project = await Project.create({
             project_code: project_code,
             project_name: project_name,
         });
@@ -20,6 +19,7 @@ async function insert(req, res) {
         return res.status(200).json({
             status: true,
             message: "Project add successfully!",
+            row : project
         });
 
     } catch (error) {

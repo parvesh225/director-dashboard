@@ -2,9 +2,86 @@ import React, { Component } from 'react'
 import Footer from "../layout/Footer";
 import Header from "../layout/Header";
 import Sidebar from "../layout/Sidebar";
+const axios = require("axios").default;
 
 class ProjectDetail extends Component {
+ constructor(props) {
+        super(props);
+        this.state = {
+            Project: {
+                project_code: "",
+                project_name: "",short_name :"",
+            },
+            resStatus: {
+                isError: false,
+                messages: "",
+            },
+            projectList: []
+        };
+        this.handleChange = this.handleChange.bind(this);
+        this.submitForm = this.submitForm.bind(this);
+    }
+    handleChange(e) {
+        let project = this.state.Project;
+        project[e.target.name] = e.target.value;
+        this.setState({ Project: project });
+    }
+
+    componentDidMount() {
+        axios.get(process.env.REACT_APP_BASE_URL + "/api/admin/project")
+            .then(response => {
+                this.setState({
+                    projectList: response.data
+                });
+            })
+    }
+
+    //Submit Form
+    submitForm() {
+
+        var thizz = this;
+        // Send login request
+        axios({
+            method: "post",
+            url: process.env.REACT_APP_BASE_URL + "/api/admin/project",
+            data: thizz.state.Project,
+
+        }).then(function (response) {
+            var data = response.data
+            if (data.status === true && data) {
+                var resStatus = thizz.state.resStatus;
+                resStatus.isError = true;
+                resStatus.messages = data.message;
+                thizz.setState({ resStatus: resStatus });
+
+                // New table row insert
+                thizz.setState({
+                    projectList: [...thizz.state.projectList, data.row]
+                })
+
+                var project = thizz.state.Project
+                project = {
+                    project_code :'',
+                    project_name :''
+                }
+                thizz.setState({
+                    Project:project
+                })
+
+            }
+
+        }).catch(function (error) {
+            console.log(error.response.data.status);
+            var data = error.response.data;
+            if (error.response.data.status === false) {
+                var resStatus = thizz.state.resStatus;
+                resStatus.messages = data.message;
+                thizz.setState({ resStatus: resStatus });
+            }
+        });
+    }
   render() {
+    const { projectList = [] } = this.state;
     return (
       <>
       <Header />
@@ -24,21 +101,23 @@ class ProjectDetail extends Component {
                                         <form>
                                             <div className="card-body">
                                                 <div className="form-group">
-                                                    <label htmlFor="centreCode">Project Code</label>
-                                                    <input type="text" className="form-control" name="centreCode" id="centreCode"  />
+                                                    <label htmlFor="project_code">Project Code</label>
+                                                    <input type="text" className="form-control" name="project_code" id="project_code"  value={this.state.Project.project_code} onChange={this.handleChange}/>
                                                 </div>
                                                 <div className="form-group">
-                                                    <label htmlFor="centreName">Project Name</label>
-                                                    <input type="text" name="centreName" className="form-control" id="centreName"  />
+                                                    <label htmlFor="project_name">Project Name</label>
+                                                    <input type="text" name="project_name" className="form-control" id="project_name"  value={this.state.Project.project_name} onChange={this.handleChange}/>
                                                 </div>
                                                
                                             </div>
                                             <div className="card-footer">
-                                                <button type="submit" className="btn btn-primary">Submit</button>
+                                            <button type="button" onClick={this.submitForm} className="btn btn-primary">Submit</button>
                                             </div>
                                         </form>
                                     </div>
-
+                                    {this.state.resStatus.messages !== '' ?
+                                        (<div className={"alert " + (this.state.resStatus.isError ? "alert-success" : "alert-danger")}> {this.state.resStatus.messages} </div>)
+                                        : ""}
                                 </div>
                                 <div className="col-md-7">
                                     <div className="card">
@@ -56,46 +135,24 @@ class ProjectDetail extends Component {
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    <tr>
-                                                        <td>1.</td>
-                                                        <td>Update software</td>
-                                                        <td>
-                                                            <div className="progress progress-xs">
-                                                                <div className="progress-bar progress-bar-danger" style={{ width: '55%' }} />
-                                                            </div>
-                                                        </td>
-                                                        <td><i className="fa fa-trash text-danger mr-2" aria-hidden="true"></i> <i class="fa fa-pencil-square-o text-primary" aria-hidden="true" ></i></td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>2.</td>
-                                                        <td>Clean database</td>
-                                                        <td>
-                                                            <div className="progress progress-xs">
-                                                                <div className="progress-bar bg-warning" style={{ width: '70%' }} />
-                                                            </div>
-                                                        </td>
-                                                        <td><i className="fa fa-trash text-danger mr-2" aria-hidden="true"></i> <i class="fa fa-pencil-square-o text-primary" aria-hidden="true" ></i></td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>3.</td>
-                                                        <td>Cron job running</td>
-                                                        <td>
-                                                            <div className="progress progress-xs progress-striped active">
-                                                                <div className="progress-bar bg-primary" style={{ width: '30%' }} />
-                                                            </div>
-                                                        </td>
-                                                        <td><i className="fa fa-trash text-danger mr-2" aria-hidden="true"></i> <i class="fa fa-pencil-square-o text-primary" aria-hidden="true" ></i></td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>4.</td>
-                                                        <td>Fix and squish bugs</td>
-                                                        <td>
-                                                            <div className="progress progress-xs progress-striped active">
-                                                                <div className="progress-bar bg-success" style={{ width: '90%' }} />
-                                                            </div>
-                                                        </td>
-                                                        <td><i className="fa fa-trash text-danger mr-2" aria-hidden="true"></i> <i class="fa fa-pencil-square-o text-primary" aria-hidden="true" ></i></td>
-                                                    </tr>
+                                                {projectList.length ?
+                                                        projectList.map((project,idx) => (
+                                                            <tr>
+                                                                <td>{idx +1}</td>
+                                                                <td>{project.project_code}</td>
+                                                                <td>{project.project_name}</td>
+                                                                
+                                                                <td><i className="fa fa-trash text-danger mr-2" aria-hidden="true"></i> <i class="fa fa-pencil-square-o text-primary" aria-hidden="true" ></i></td>
+                                                            </tr>
+                                                        ))
+                                                        :
+                                                        (<tr>
+                                                            <td>-</td>
+                                                            <td>-</td>
+                                                            <td>-</td>
+                                                           
+                                                        </tr>)
+                                                    }
                                                 </tbody>
                                             </table>
                                         </div>

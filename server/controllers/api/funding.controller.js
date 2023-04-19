@@ -4,16 +4,16 @@ const { FundingAgency } = require("../../models/FundingAgency");
 async function insert(req, res) {
 
     try {
-        const { funding_agency_code, funding_agency_name } = req.body;
+        const { agency_code, agency_name } = req.body;
 
-        if (!funding_agency_code || !funding_agency_name) {
-            throw new Error("Funding code and funding name is required");
+        if (!agency_code || !agency_name) {
+            throw new Error("Funding code and name is required");
         }
 
-        // Create Centre
-        let centre = await FundingAgency.create({
-            funding_agency_code: funding_agency_code,
-            funding_agency_name: funding_agency_name,
+        // Create Funding Agency
+        let agency = await FundingAgency.create({
+            agency_code: agency_code,
+            agency_name: agency_name,
         });
 
 
@@ -21,6 +21,7 @@ async function insert(req, res) {
         return res.status(200).json({
             status: true,
             message: "Funding Agency add successfully!",
+            row : agency
         });
 
     } catch (error) {

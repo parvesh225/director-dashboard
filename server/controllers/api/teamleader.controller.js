@@ -9,8 +9,8 @@ async function insert(req, res) {
             throw new Error("Employee name and employee code is required");
         }
 
-        // Create Centre
-        let centre = await TeamLeader.create({
+        // Create employee
+        let employee = await TeamLeader.create({
             employee_code: employee_code,
             employee_name: employee_name,
         });
@@ -20,6 +20,7 @@ async function insert(req, res) {
         return res.status(200).json({
             status: true,
             message: "TeamLeader add successfully!",
+            row : employee
         });
 
     } catch (error) {
