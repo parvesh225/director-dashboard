@@ -17,7 +17,7 @@ TeamStrength.init({
   },
   team: {
     type: DataTypes.STRING,
-    allowNull: false
+    allowNull: true
   },
   position: {
     type: DataTypes.STRING,
@@ -34,14 +34,6 @@ TeamStrength.init({
   salary_slab: {
     type: DataTypes.STRING,
     allowNull: false
-  },
-  employee_code: {
-    type: DataTypes.STRING,
-    allowNull: true
-  },
-  employee_name: {
-    type: DataTypes.STRING,
-    allowNull: true
   }
 }, {
   // Other model options go here

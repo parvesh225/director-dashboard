@@ -18,7 +18,7 @@ OtherActivitie.init({
    
     activities: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: true
     },
     date: {
       type: DataTypes.DATE,

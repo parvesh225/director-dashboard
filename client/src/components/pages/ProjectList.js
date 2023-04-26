@@ -51,7 +51,7 @@ class ProjectList extends Component {
         })
 
         let agency = this.state.funding_agency.map(function (agency, index) {
-            return <option key={agency.id} value={agency.funding_agency_code}>  {agency.funding_agency_name} </option>
+            return <option key={agency.id} value={agency.agency_code}>  {agency.agency_name} </option>
         })
         return (
             <>

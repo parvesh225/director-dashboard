@@ -2,6 +2,9 @@ import React, { Component } from 'react'
 import Footer from "../layout/Footer";
 import Header from "../layout/Header";
 import Sidebar from "../layout/Sidebar";
+import { Link } from "react-router-dom";
+import withRouter from '../withRouter';
+
 const axios = require("axios").default;
 
 class Centre extends Component {
@@ -17,10 +20,12 @@ class Centre extends Component {
                 isError: false,
                 messages: "",
             },
-            centreList: []
+            centreList: [],
+            updateCentre:true
         };
         this.handleChange = this.handleChange.bind(this);
         this.submitForm = this.submitForm.bind(this);
+        this.renderElement = this.renderElement.bind(this);
     }
     handleChange(e) {
         let centre = this.state.Centre;
@@ -29,13 +34,72 @@ class Centre extends Component {
     }
 
     componentDidMount() {
+        console.log('Props:', this.props.params.id);
         axios.get(process.env.REACT_APP_BASE_URL + "/api/admin/centre")
             .then(response => {
                 this.setState({
-                    centreList: response.data
+                    centreList: response.data,
                 });
             })
     }
+
+    renderElement(){
+        if(this.state.updateCentre == false)
+           return  <>
+            <div className="card card-primary">
+           <div className="card-header">
+               <h3 className="card-title"> Add Centre</h3>
+           </div>
+           <form>
+               <div className="card-body">
+                   <div className="form-group">
+                       <label htmlFor="centre_code">Centre Code</label>
+                       <input type="text" className="form-control" value={this.state.Centre.centre_code} onChange={this.handleChange} name="centre_code" id="centre_code" />
+                   </div>
+                   <div className="form-group">
+                       <label htmlFor="centre_name">Centre Name</label>
+                       <input type="text" name="centre_name" value={this.state.Centre.centre_name} onChange={this.handleChange} className="form-control" id="centre_name" />
+                   </div>
+                   <div className="form-group">
+                       <label htmlFor="short_name">Short Name</label>
+                       <input type="text" name="short_name" value={this.state.Centre.short_name} onChange={this.handleChange} className="form-control" id="centre_name" />
+                   </div>
+
+               </div>
+               <div className="card-footer">
+                   <button type="button" onClick={this.submitForm} className="btn btn-primary">Submit</button>
+               </div>
+           </form>
+       </div>
+           </>
+        return <>
+            <div className="card card-primary">
+        <div className="card-header">
+            <h3 className="card-title"> Update Centre</h3>
+        </div>
+        <form>
+            <div className="card-body">
+                <div className="form-group">
+                    <label htmlFor="centre_code">Centre Code</label>
+                    <input type="text" className="form-control" value={this.state.Centre.centre_code} onChange={this.handleChange} name="centre_code" id="centre_code" />
+                </div>
+                <div className="form-group">
+                    <label htmlFor="centre_name">Centre Name</label>
+                    <input type="text" name="centre_name" value={this.state.Centre.centre_name} onChange={this.handleChange} className="form-control" id="centre_name" />
+                </div>
+                <div className="form-group">
+                    <label htmlFor="short_name">Short Name</label>
+                    <input type="text" name="short_name" value={this.state.Centre.short_name} onChange={this.handleChange} className="form-control" id="centre_name" />
+                </div>
+
+            </div>
+            <div className="card-footer">
+                <button type="button" onClick={this.submitForm} className="btn btn-primary">Update</button>
+            </div>
+        </form>
+    </div>
+        </>
+     }
 
     //Submit Form
     submitForm() {
@@ -96,45 +160,16 @@ class Centre extends Component {
                         <div className="container-fluid">
                             <div className="row">
                                 <div className="col-md-5">
-
-                                    <div className="card card-primary">
-                                        <div className="card-header">
-                                            <h3 className="card-title">Centre Name </h3>
-                                        </div>
-                                        <form>
-                                            <div className="card-body">
-                                                <div className="form-group">
-                                                    <label htmlFor="centre_code">Centre Code</label>
-                                                    <input type="text" className="form-control" value={this.state.Centre.centre_code} onChange={this.handleChange} name="centre_code" id="centre_code" />
-                                                </div>
-                                                <div className="form-group">
-                                                    <label htmlFor="centre_name">Centre Name</label>
-                                                    <input type="text" name="centre_name" value={this.state.Centre.centre_name} onChange={this.handleChange} className="form-control" id="centre_name" />
-                                                </div>
-                                                <div className="form-group">
-                                                    <label htmlFor="short_name">Short Name</label>
-                                                    <input type="text" name="short_name" value={this.state.Centre.short_name} onChange={this.handleChange} className="form-control" id="centre_name" />
-                                                </div>
-
-                                            </div>
-                                            <div className="card-footer">
-                                                <button type="button" onClick={this.submitForm} className="btn btn-primary">Submit</button>
-                                            </div>
-                                        </form>
-                                    </div>
-
+                                    {this.renderElement()}
                                     {this.state.resStatus.messages !== '' ?
                                         (<div className={"alert " + (this.state.resStatus.isError ? "alert-success" : "alert-danger")}> {this.state.resStatus.messages} </div>)
                                         : ""}
-
-
-
 
                                 </div>
                                 <div className="col-md-7">
                                     <div className="card">
                                         <div className="card-header">
-                                            <h3 className="card-title">Centre List</h3>
+                                            <h3 className="card-title">List Centre </h3>
                                         </div>
                                         <div className="card-body">
                                             <table className="table table-bordered">
@@ -155,7 +190,15 @@ class Centre extends Component {
                                                                 <td>{centre.centre_code}</td>
                                                                 <td>{centre.centre_name}</td>
                                                                 <td>{centre.short_name}</td>
-                                                                <td><i className="fa fa-trash text-danger mr-2" aria-hidden="true"></i> <i class="fa fa-pencil-square-o text-primary" aria-hidden="true" ></i></td>
+                                                                
+                                                                <td>
+                                                                    <Link to="/admin/project-plan-edit/23" >
+                                                                        <i class="fa fa-trash text-danger mr-2" aria-hidden="true" ></i>
+                                                                    </Link>
+                                                                    <Link to={`/admin/centre-edit/${centre.id}`} >
+                                                                        <i class="fa fa-pencil-square-o text-primary" aria-hidden="true" ></i>
+                                                                    </Link>
+                                                                </td>
                                                             </tr>
                                                         ))
                                                         :
@@ -169,15 +212,7 @@ class Centre extends Component {
                                                 </tbody>
                                             </table>
                                         </div>
-                                        {/* <div className="card-footer clearfix">
-                                            <ul className="pagination pagination-sm m-0 float-right">
-                                                <li className="page-item"><a className="page-link" href="#/">«</a></li>
-                                                <li className="page-item"><a className="page-link" href="#/">1</a></li>
-                                                <li className="page-item"><a className="page-link" href="#/">2</a></li>
-                                                <li className="page-item"><a className="page-link" href="#/">3</a></li>
-                                                <li className="page-item"><a className="page-link" href="#/">»</a></li>
-                                            </ul>
-                                        </div> */}
+                                        
                                     </div>
 
                                 </div>
@@ -201,4 +236,5 @@ class Centre extends Component {
     }
 }
 
-export default Centre
+
+export default withRouter(Centre);

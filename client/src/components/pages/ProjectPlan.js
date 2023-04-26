@@ -10,26 +10,26 @@ class ProjectPlan extends Component {
     super(props);
     this.state = {
       centre: [],
-      project: [], 
+      project: [],
       project_head: [],
       funding_agency: [],
       resStatus: {
         isError: false,
         messages: "",
-    },
+      },
       singleFields: {
         centre_name: "",
         project_name: "",
         team_head: "",
-        funding_ministry:"",
-        project_brief: "project_brief",
-        work_order: "work_order",
-        nodal_officer: "nodal_officer",
-        contact_no: "989898999",
-        allocated_budget: "14.5",
-        start_date: "2020-09-01",
-        end_date: "2020-09-01",
-        overall_progress: "overall_progress",
+        funding_ministry: "",
+        project_brief: "",
+        work_order: "",
+        nodal_officer: "",
+        contact_no: "",
+        allocated_budget: "",
+        start_date: "",
+        end_date: "",
+        overall_progress: "",
       },
       team_strength: [
         {
@@ -71,70 +71,81 @@ class ProjectPlan extends Component {
     this.handleChangeMul = this.handleChangeMul.bind(this);
     this.handleRemoveSpecificRow = this.handleRemoveSpecificRow.bind(this);
     this.submitForm = this.submitForm.bind(this);
+    this.diffDays = this.diffDays.bind(this);
   }
+  diffDays(date1, date2)
+{
+  var date1 = new Date(date1);
+    var date2 = new Date(date2);
+     
+    var Difference_In_Time = date2.getTime() - date1.getTime();
+    var Difference_In_Days = Difference_In_Time / (1000 * 3600 * 24);
+  
+   return  Difference_In_Days;
+}
 
   componentDidMount() {
     axios.get(process.env.REACT_APP_BASE_URL + "/api/admin/fetch-master-data")
-    .then((response)=> {
-      var centre_name= this.state.singleFields.centre_name;
-      var centre = response.data.centres
-      var project = response.data.projects
-      var team = response.data.teams
-      var agency = response.data.agencys
-      
-
-    this.setState({
-      centre: centre,
-      project: project,
-      project_head: team,
-      funding_agency: agency,
-    })
-     
-    }).catch((error)=> {
-      console.log(error.response);
-    })
-        
-}
+      .then((response) => {
+        var centre_name = this.state.singleFields.centre_name;
+        var centre = response.data.centres
+        var project = response.data.projects
+        var team = response.data.teams
+        var agency = response.data.agencys
 
 
-//Submit Form
-submitForm() {
-  var thizz = this;
-  var myObj = {
-    FormData: thizz.state.singleFields,
-    team_strength: thizz.state.team_strength,
-    finances: thizz.state.finances,
-    project_activities: thizz.state.project_activities,
-    other_activities:thizz.state.other_activities
+        this.setState({
+          centre: centre,
+          project: project,
+          project_head: team,
+          funding_agency: agency,
+        })
+
+      }).catch((error) => {
+        console.log(error.response);
+      })
+
   }
-  //Send request to backend
-  axios({
-    method:"post",
-    url:process.env.REACT_APP_BASE_URL +"/api/admin/project-plan",
-    data: myObj
-  }).then(function(response) {
-    var data = response.data
-    if (data.status === true && data) {
-      var resStatus = thizz.state.resStatus;
-      resStatus.isError = true;
-      resStatus.messages = data.message;
-      thizz.setState({ resStatus: resStatus });
+
+
+  //Submit Form
+  submitForm() {
+    var thizz = this;
+    var myObj = {
+      FormData: thizz.state.singleFields,
+      team_strength: thizz.state.team_strength,
+      finances: thizz.state.finances,
+      project_activities: thizz.state.project_activities,
+      other_activities: thizz.state.other_activities
     }
+    //Send request to backend
+    axios({
+      method: "post",
+      url: process.env.REACT_APP_BASE_URL + "/api/admin/project-plan",
+      data: myObj
+    }).then(function (response) {
+      var data = response.data
+      if (data.status === true && data) {
+        var resStatus = thizz.state.resStatus;
+        resStatus.isError = true;
+        resStatus.messages = data.message;
+        thizz.setState({ resStatus: resStatus });
+      }
 
-  }).catch(function(error) {
-    console.log(error.response.data)
-    var data = error.response.data;
-    if (error.response.data.status === false) {
-          var resStatus = thizz.state.resStatus;
-          resStatus.messages = data.message;
-          thizz.setState({ resStatus: resStatus });
-        }
-  })
+    }).catch(function (error) {
+      console.log(error.response.data)
+      var data = error.response.data;
+      if (error.response.data.status === false) {
+        var resStatus = thizz.state.resStatus;
+        resStatus.messages = data.message;
+        thizz.setState({ resStatus: resStatus });
+      }
+    })
 
-}
+  }
 
 
-  
+
 
   // For simple fields
   handleChange(e) {
@@ -153,21 +164,34 @@ submitForm() {
       this.setState({
         team_strength: team_strength,
       });
-    } else if(type === "finances") {
+    } else if (type === "finances") {
       const { name, value } = e.target;
       const finances = this.state.finances;
       finances[idx][name] = value;
       this.setState({
         finances: finances,
       });
-    } else if(type === "project_activities") {
+    } else if (type === "project_activities") {
+      
       const { name, value } = e.target;
       const project_activities = this.state.project_activities;
       project_activities[idx][name] = value;
+
+      var startDate = this.state.project_activities[idx]['start_date'];
+      var endDate = this.state.project_activities[idx]['end_date'];
+      if(startDate && endDate) {
+        var days = this.diffDays(startDate, endDate);
+        project_activities[idx]['duration'] = days;
+      }
       this.setState({
         project_activities: project_activities,
       });
-    } else if(type === "other_activities") {
+
+      
+
+     
+
+    } else if (type === "other_activities") {
       const { name, value } = e.target;
       const other_activities = this.state.other_activities;
       other_activities[idx][name] = value;
@@ -183,17 +207,17 @@ submitForm() {
       team_strength.splice(idx, 1);
       this.setState({ team_strength: team_strength });
 
-    } else if(this.state.finances.length >1 && type === "finances") {
+    } else if (this.state.finances.length > 1 && type === "finances") {
       const finances = this.state.finances;
       finances.splice(idx, 1);
       this.setState({ finances: finances });
 
-    } else if(this.state.project_activities.length >1 && type === "project_activities") {
+    } else if (this.state.project_activities.length > 1 && type === "project_activities") {
       const project_activities = this.state.project_activities;
       project_activities.splice(idx, 1);
       this.setState({ project_activities: project_activities });
 
-    } else if(this.state.other_activities.length >1 && type === "other_activities") {
+    } else if (this.state.other_activities.length > 1 && type === "other_activities") {
       const other_activities = this.state.other_activities;
       other_activities.splice(idx, 1);
       this.setState({ other_activities: other_activities });
@@ -223,46 +247,48 @@ submitForm() {
       this.setState({
         finances: [...this.state.finances, item],
       });
-    } else if(type === "project_activities") {
+    } else if (type === "project_activities") {
       const item = {
-          type: "",
-          start_date: "",
-          end_date: "",
-          duration: "",
-          activities: "",
-          Remarks: "",
+        type: "",
+        start_date: "",
+        end_date: "",
+        duration: "",
+        activities: "",
+        Remarks: "",
       };
       this.setState({
         project_activities: [...this.state.project_activities, item],
       });
-    } else if(type === "other_activities") {
+    } else if (type === "other_activities") {
       const item = {
         other_activity: "",
-          other_date: "",
-    };
-    this.setState({
-      other_activities: [...this.state.other_activities, item],
-    });
+        other_date: "",
+      };
+      this.setState({
+        other_activities: [...this.state.other_activities, item],
+      });
     }
   }
 
   render() {
     let centre = this.state.centre.map(function (center, index) {
-      
-      return <option   key={center.id} value={center.centre_code}>{center.centre_name}</option>;
-  })
+
+      return <option key={center.id} value={center.centre_code}>{center.centre_name}</option>;
+    })
     let project = this.state.project.map(function (project, index) {
       return <option key={project.id} value={project.project_code}>{project.project_name}</option>;
 
-  })
+    })
 
-    let team = this.state.project_head.map(function(team, index) {
+    let team = this.state.project_head.map(function (team, index) {
       return <option key={team.id} value={team.employee_code}> {team.employee_name} </option>
     })
 
-    let agency = this.state.funding_agency.map(function(agency, index) {
-      return <option key={agency.id} value={agency.agency_code}>  {agency.agency_name	} </option>
+    let agency = this.state.funding_agency.map(function (agency, index) {
+      return <option key={agency.id} value={agency.agency_code}>  {agency.agency_name} </option>
     })
+
+    var nDays = this.diffDays(new Date(), new Date());
     return (
       <>
         <Header />
@@ -277,13 +303,15 @@ submitForm() {
                     <div className="card-header">
                       <h3 className="card-title"> Project Form-I </h3>
                     </div>
-                    <form>
+                    <form> 
+                    
                       <div className="card-body">
                         <div className="row">
                           <div className="col-md-6">
                             <div className="form-group">
                               <label htmlFor="centreName">Centre Name </label>
                               {/* {JSON.stringify(this.state.singleFields.centre_name)}ssss */}
+                             
                               <select
                                 class="form-control "
                                 name="centre_name"
@@ -316,7 +344,7 @@ submitForm() {
                           <div className="col-md-6">
                             <div className="form-group">
                               <label htmlFor="projectHeadName">
-                                Project Head Name 
+                                Project Head Name
                               </label>
                               <select
                                 class="form-control "
@@ -344,9 +372,9 @@ submitForm() {
                               />
                             </div>
                           </div> */}
-                           <div className="form-group col-md-6">
+                          <div className="form-group col-md-6">
                             <label for="fundingMinistry/Agency/Dept">
-                              Funding Ministry/Agency/Dept. 
+                              Funding Ministry/Agency/Dept.
                             </label>
                             <select
                               class="form-control "
@@ -392,7 +420,7 @@ submitForm() {
                         </div>
 
                         <div className="row ">
-                        
+
 
                           <div className="form-group col-md-6">
                             <label for="nodalOfficerName" className="p">
@@ -411,10 +439,10 @@ submitForm() {
                           <div className="form-group col-md-6">
                             <label for="contactNo">Contact no.</label>
                             <input
+                              type="text"
                               className="form-control"
                               id="contact_no"
                               name="contact_no"
-                              placeholder="Contact No"
                               value={this.state.singleFields.contact_no}
                               onChange={this.handleChange}
                             />
@@ -435,7 +463,7 @@ submitForm() {
                               onChange={this.handleChange}
                             />
                           </div>
-                          <div className="form-group col-md-6">
+                          {/* <div className="form-group col-md-6">
                             <label for="overall_progress">
                               Overall Progress
                             </label>
@@ -447,10 +475,8 @@ submitForm() {
                               value={this.state.singleFields.overall_progress}
                               onChange={this.handleChange}
                             />
-                          </div>
-                        </div>
-                        <div className="row">
-                          <div className="form-group col-md-6">
+                          </div> */}
+                           <div className="form-group col-md-6">
                             <label for="startDate">Start Date</label>
                             <input
                               type="date"
@@ -461,6 +487,9 @@ submitForm() {
                               onChange={this.handleChange}
                             />
                           </div>
+                        </div>
+                        <div className="row">
+                         
                           <div className="form-group col-md-6">
                             <label for="endDate">End Date</label>
                             <input
@@ -473,13 +502,13 @@ submitForm() {
                             />
                           </div>
                         </div>
-                       
+
                         <p className="lead"> Team Strength </p>
                         <table className="table">
                           <thead className="thead-dark">
                             <tr>
                               <th>S.No</th>
-                              <th>Team Strength</th>
+                              {/* <th>Team Strength</th> */}
                               <th>Position</th>
                               <th>Experience</th>
                               <th>Qualification</th>
@@ -490,26 +519,27 @@ submitForm() {
                           <tbody id="tbl">
                             {this.state.team_strength.map((item, idx) => (
                               <tr key={"ts-" + idx}>
-                                <td>{idx +1}</td>
-                                <td>
+                                <td>{idx + 1}</td>
+                                {/* <td>
                                   <input
+                                  key={idx}
                                     type="text"
                                     className="form-control"
                                     id="team"
-                                    placeholder="Team strength"
+                                    placeholder="Integer value"
                                     name="team"
                                     onChange={(evnt) =>this.handleChangeMul(idx,evnt,"teamStrength")}
                                     value={item.team}
                                   />
-                                </td>
+                                </td> */}
                                 <td>
                                   <input
                                     type="text"
                                     className="form-control"
                                     id="position"
-                                    placeholder="Position"
+                                    placeholder="Designation"
                                     name="position"
-                                    onChange={ (evnt) =>this.handleChangeMul(idx,evnt,"teamStrength") }
+                                    onChange={(evnt) => this.handleChangeMul(idx, evnt, "teamStrength")}
                                     value={item.position}
                                   />
                                 </td>
@@ -520,7 +550,7 @@ submitForm() {
                                     id="experience"
                                     placeholder="Experience"
                                     name="experience"
-                                    onChange={ (evnt) =>this.handleChangeMul(idx,evnt,"teamStrength") }
+                                    onChange={(evnt) => this.handleChangeMul(idx, evnt, "teamStrength")}
                                     value={item.experience}
                                   />
                                 </td>
@@ -531,7 +561,7 @@ submitForm() {
                                     id="qualification"
                                     placeholder="Qualification"
                                     name="qualification"
-                                    onChange={ (evnt) =>this.handleChangeMul(idx,evnt,"teamStrength") }
+                                    onChange={(evnt) => this.handleChangeMul(idx, evnt, "teamStrength")}
                                     value={item.qualification}
                                   />
                                 </td>
@@ -542,7 +572,7 @@ submitForm() {
                                     id="salary_slab"
                                     placeholder="Salary slab"
                                     name="salary_slab"
-                                    onChange={ (evnt) =>this.handleChangeMul(idx,evnt,"teamStrength") }
+                                    onChange={(evnt) => this.handleChangeMul(idx, evnt, "teamStrength")}
                                     value={item.salary_slab}
                                   />
                                 </td>
@@ -557,7 +587,7 @@ submitForm() {
                                   <button
                                     type="button"
                                     className="btn btn-success btn-sm"
-                                    onClick={() => this.handleRemoveSpecificRow(idx,"teamStrength")
+                                    onClick={() => this.handleRemoveSpecificRow(idx, "teamStrength")
                                     }
                                   >
                                     -
@@ -580,82 +610,72 @@ submitForm() {
                             </tr>
                           </thead>
                           <tbody id="tbl2">
-                            {this.state.finances.map((item, idx)=> (
-                               <tr key={"fin-" + idx}>
-                               <td>
-                                 <input
-                                   type="text"
-                                   className="form-control"
-                                   id="year"
-                                   placeholder="Year"
-                                   name="year"
-                                   onChange={ (evnt) =>this.handleChangeMul(idx,evnt,"finances") }
+                            {this.state.finances.map((item, idx) => (
+                              <tr key={"fin-" + idx}>
+                                <td>
+                                  <input
+                                    type="text"
+                                    className="form-control"
+                                    id="year"
+                                    placeholder="Year"
+                                    name="year"
+                                    onChange={(evnt) => this.handleChangeMul(idx, evnt, "finances")}
                                     value={item.year}
-                                 />
-                               </td>
-                               <td>
-                                 <select
-                                   class="form-control"
-                                   name="budget_head"
-                                   id="budget_head"
-                                   onChange={ (evnt) =>this.handleChangeMul(idx,evnt,"finances") }
+                                  />
+                                </td>
+                               
+                                <td>
+                                <input
+                                    type="text"
+                                    className="form-control"
+                                    id="budget_head"
+                                    placeholder="Budget head"
+                                    name="budget_head"
+                                    onChange={(evnt) => this.handleChangeMul(idx, evnt, "finances")}
                                     value={item.budget_head}
-                                 >
-                                   <option selected="selected"> select </option>
-                                   <option value="hr cost">HR Cost</option>
-                                   <option value="travel cost">
-                                     Travel Cost
-                                   </option>
-                                   <option value="infrastructure cost">
-                                     Infrastructure Cost
-                                   </option>
-                                   <option value="Miscellaneous cost">
-                                     Miscellaneous Cost
-                                   </option>
-                                   <option value="a&o">A&O</option>
-                                 </select>
-                               </td>
-                               <td>
-                                 <input
-                                   type="text"
-                                   className="form-control"
-                                   id="allocated_fund"
-                                   placeholder="Allocated Fund"
-                                   name="allocated_fund"
-                                   onChange={ (evnt) =>this.handleChangeMul(idx,evnt,"finances") }
+                                  />
+                                </td>
+                                <td>
+                                  <input
+                                    type="text"
+                                    className="form-control"
+                                    id="allocated_fund"
+                                    placeholder="Allocated Fund"
+                                    name="allocated_fund"
+                                    onChange={(evnt) => this.handleChangeMul(idx, evnt, "finances")}
                                     value={item.allocated_fund}
-                                 />
-                               </td>
-                               <td>
-                                 <input
-                                   type="text"
-                                   className="form-control"
-                                   id="milestone"
-                                   placeholder="Milestone"
-                                   name="milestone"
-                                   onChange={ (evnt) =>this.handleChangeMul(idx,evnt,"finances") }
+                                  />
+                                </td>
+                                <td>
+                                  <input
+                                    type="text"
+                                    className="form-control"
+                                    id="milestone"
+                                    placeholder="Milestone"
+                                    name="milestone"
+                                    onChange={(evnt) => this.handleChangeMul(idx, evnt, "finances")}
                                     value={item.milestone}
-                                 />
-                               </td>
-                               <td>
-                                 <button
-                                   className="btn btn-danger btn-sm m-1"
-                                   type="button"
-                                   onClick={() => this.handleAddRow("finances")}
-                                 >
-                                   +
-                                 </button>
-                                 <button
-                                   type="button"
-                                   className="btn btn-success btn-sm"
-                                   onClick={() => this.handleRemoveSpecificRow(idx,"finances")}
-                                 >
-                                   -
-                                 </button>
-                               </td>
-                             </tr>
+                                  />
+                                </td>
+                                <td>
+                                  <button
+                                    className="btn btn-danger btn-sm m-1"
+                                    type="button"
+                                    onClick={() => this.handleAddRow("finances")}
+                                  >
+                                    +
+                                  </button>
+                                  <button
+                                    type="button"
+                                    className="btn btn-success btn-sm"
+                                    onClick={() => this.handleRemoveSpecificRow(idx, "finances")}
+                                  >
+                                    -
+                                  </button>
+                                </td>
+                              </tr>
                             ))}
-                           
+
                           </tbody>
                         </table>
 
@@ -673,89 +693,90 @@ submitForm() {
                             </tr>
                           </thead>
                           <tbody id="tbl3">
-                            {this.state.project_activities.map((item, idx)=> (
-                               <tr key={"pa-" + idx}>
-                              <td>
-                                <select
-                                  class="form-control select2 select2-hidden-accessible"
-                                  name="type"
-                                  id="type"
-                                  onChange={ (evnt) =>this.handleChangeMul(idx,evnt,"project_activities") }
-                                  value={item.type}
-                                >
-                                  <option selected="selected">select</option>
-                                  <option value="major">Major</option>
-                                  <option value="critical">Critical</option>
-                                  <option value="remaining">Remaining</option>
-                                </select>
-                              </td>
-                              <td>
-                                <input
-                                  type="date"
-                                  className="form-control"
-                                  id="start_date"
-                                  name="start_date"
-                                  onChange={ (evnt) =>this.handleChangeMul(idx,evnt,"project_activities") }
-                                  value={item.start_date}
-                                />
-                              </td>
-                              <td>
-                                <input
-                                  type="date"
-                                  className="form-control"
-                                  id="end_date"
-                                  name="end_date"
-                                  onChange={ (evnt) =>this.handleChangeMul(idx,evnt,"project_activities") }
-                                  value={item.end_date}
-                                />
-                              </td>
-                              <td>
-                                <input
-                                  type="text"
-                                  className="form-control"
-                                  name="duration"
-                                  id="duration"
-                                  onChange={ (evnt) =>this.handleChangeMul(idx,evnt,"project_activities") }
-                                  value={item.duration}
-                                />
-                              </td>
-                              <td>
-                                <textarea
-                                  className="form-control "
-                                  id="activities"
-                                  name="activities"
-                                  placeholder="Activities"
-                                  onChange={ (evnt) =>this.handleChangeMul(idx,evnt,"project_activities") }
-                                  value={item.activities}
-                                ></textarea>
-                              </td>
-                              <td>
-                                <textarea
-                                  className="form-control "
-                                  id="remarks"
-                                  name="remarks"
-                                  placeholder="Remarks"
-                                  onChange={ (evnt) =>this.handleChangeMul(idx,evnt,"project_activities") }
-                                  value={item.remarks}
-                                ></textarea>
-                              </td>
-                              <td>
-                                <button
-                                  className="btn btn-danger btn-sm m-1"
-                                  type="button"
-                                  onClick={() => this.handleAddRow("project_activities")}
-                                >
-                                  +
-                                </button>
-                                <button
-                                  type="button"
-                                  className="btn btn-success btn-sm"
-                                  onClick={() => this.handleRemoveSpecificRow(idx,"project_activities")}
-                                >
-                                  -
-                                </button>
-                              </td>
-                            </tr>
+                            {this.state.project_activities.map((item, idx) => (
+                              <tr key={"pa-" + idx}>
+                                <td>
+                                  <select
+                                    class="form-control select2 select2-hidden-accessible"
+                                    name="type"
+                                    id="type"
+                                    onChange={(evnt) => this.handleChangeMul(idx, evnt, "project_activities")}
+                                    value={item.type}
+                                  >
+                                    <option selected="selected">select</option>
+                                    <option value="major">Major</option>
+                                    <option value="critical">Critical</option>
+                                    <option value="remaining">Remaining</option>
+                                  </select>
+                                </td>
+                                <td>
+                                  <input
+                                    type="date"
+                                    className="form-control"
+                                    id="start_date"
+                                    name="start_date"
+                                    onChange={(evnt) => this.handleChangeMul(idx, evnt, "project_activities")}
+                                    value={item.start_date}
+                                  />
+                                </td>
+                                <td>
+                                  <input
+                                    type="date"
+                                    className="form-control"
+                                    id="end_date"
+                                    name="end_date"
+                                    onChange={(evnt) => this.handleChangeMul(idx, evnt, "project_activities")}
+                                    value={item.end_date}
+                                  />
+                                </td>
+                                <td>
+                                  <input
+                                    type="text"
+                                    className="form-control"
+                                    name="duration"
+                                    id="duration"
+                                    // onChange={(evnt) => this.handleChangeMul(idx, evnt, "project_activities")}
+                                    value={item.duration}
+                                    readOnly
+                                  />
+                                </td>
+                                <td>
+                                  <textarea
+                                    className="form-control "
+                                    id="activities"
+                                    name="activities"
+                                    placeholder="Activities"
+                                    onChange={(evnt) => this.handleChangeMul(idx, evnt, "project_activities")}
+                                    value={item.activities}
+                                  ></textarea>
+                                </td>
+                                <td>
+                                  <textarea
+                                    className="form-control "
+                                    id="remarks"
+                                    name="remarks"
+                                    placeholder="Remarks"
+                                    onChange={(evnt) => this.handleChangeMul(idx, evnt, "project_activities")}
+                                    value={item.remarks}
+                                  ></textarea>
+                                </td>
+                                <td>
+                                  <button
+                                    className="btn btn-danger btn-sm m-1"
+                                    type="button"
+                                    onClick={() => this.handleAddRow("project_activities")}
+                                  >
+                                    +
+                                  </button>
+                                  <button
+                                    type="button"
+                                    className="btn btn-success btn-sm"
+                                    onClick={() => this.handleRemoveSpecificRow(idx, "project_activities")}
+                                  >
+                                    -
+                                  </button>
+                                </td>
+                              </tr>
                             ))}
                           </tbody>
                         </table>
@@ -771,65 +792,65 @@ submitForm() {
                             </tr>
                           </thead>
                           <tbody id="tbl4">
-                            {this.state.other_activities.map((item, idx)=> (
-                               <tr key={"oa-" + idx}>
-                              <td>
-                                <input
-                                  type="text"
-                                  className="form-control"
-                                  id="other_activity"
-                                  placeholder="Other Activity"
-                                  name="other_activity"
-                                  onChange={ (evnt) =>this.handleChangeMul(idx,evnt,"other_activities") }
-                                  value={item.other_activity}
-                                />
-                              </td>
-                              <td>
-                                <input
-                                  type="date"
-                                  className="form-control"
-                                  id="other_date"
-                                  placeholder="Position"
-                                  name="other_date"
-                                  onChange={ (evnt) =>this.handleChangeMul(idx,evnt,"other_activities") }
-                                  value={item.other_date}
-                                />
-                              </td>
+                            {this.state.other_activities.map((item, idx) => (
+                              <tr key={"oa-" + idx}>
+                                <td>
+                                  <input
+                                    type="text"
+                                    className="form-control"
+                                    id="other_activity"
+                                    placeholder="Other Activity"
+                                    name="other_activity"
+                                    onChange={(evnt) => this.handleChangeMul(idx, evnt, "other_activities")}
+                                    value={item.other_activity}
+                                  />
+                                </td>
+                                <td>
+                                  <input
+                                    type="date"
+                                    className="form-control"
+                                    id="other_date"
+                                    placeholder="Position"
+                                    name="other_date"
+                                    onChange={(evnt) => this.handleChangeMul(idx, evnt, "other_activities")}
+                                    value={item.other_date}
+                                  />
+                                </td>
 
-                              <td>
-                                <button
-                                  className="btn btn-danger btn-sm m-1"
-                                  type="button"
-                                  onClick={() => this.handleAddRow("other_activities")}
-                                >
-                                  +
-                                </button>
-                                <button
-                                  type="button"
-                                  className="btn btn-success btn-sm"
-                                  onClick={() => this.handleRemoveSpecificRow(idx,"other_activities")}
-                                >
-                                  -
-                                </button>
-                              </td>
-                            </tr>
+                                <td>
+                                  <button
+                                    className="btn btn-danger btn-sm m-1"
+                                    type="button"
+                                    onClick={() => this.handleAddRow("other_activities")}
+                                  >
+                                    +
+                                  </button>
+                                  <button
+                                    type="button"
+                                    className="btn btn-success btn-sm"
+                                    onClick={() => this.handleRemoveSpecificRow(idx, "other_activities")}
+                                  >
+                                    -
+                                  </button>
+                                </td>
+                              </tr>
                             ))}
                           </tbody>
                         </table>
                       </div>
                       <div className="card-footer row">
                         <div className="col-md-3">
-                        <button type="button" className="btn btn-primary" onClick={this.submitForm}>
-                          Submit
-                        </button>
+                          <button type="button" className="btn btn-primary" onClick={this.submitForm}>
+                            Submit
+                          </button>
                         </div>
                         <div className="col-md-9">
-                        {this.state.resStatus.messages !== '' ?
-                                        (<div className={"alert " + (this.state.resStatus.isError ? "alert-success" : "alert-danger")}> {this.state.resStatus.messages} </div>)
-                                        : ""}
+                          {this.state.resStatus.messages !== '' ?
+                            (<div className={"alert " + (this.state.resStatus.isError ? "alert-success" : "alert-danger")}> {this.state.resStatus.messages} </div>)
+                            : ""}
                         </div>
-                        
-                        
+
+
                       </div>
                     </form>
                   </div>

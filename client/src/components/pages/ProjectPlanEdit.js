@@ -4,8 +4,9 @@ import Footer from "../layout/Footer";
 import Header from "../layout/Header";
 import Sidebar from "../layout/Sidebar";
 import withRouter from '../withRouter';
-import { spawn } from "child_process";
+import moment from 'moment';
 const axios = require("axios").default;
+
 
 class ProjectPlanEdit extends Component {
   constructor(props) {
@@ -42,19 +43,12 @@ class ProjectPlanEdit extends Component {
           experience: "",
           qualification: "",
           salary_slab: "",
+          employee_code:"",
+          employee_name:""
         },
       ],
       finances: [],
-      project_activities: [
-        {
-          type: "",
-          start_date: "",
-          end_date: "",
-          duration: "",
-          activities: "",
-          remarks: "",
-        },
-      ],
+      project_activities: [],
 
       other_activities: [
         {
@@ -248,7 +242,7 @@ submitForm() {
     for (let i = 0; i < response.data.teams.length; i++) {
       var item = response.data.teams[i]
       financeesList.push({
-        id:   item.id,
+        id: item.id,
         project_plan_id: item.project_plan_id,
         team: item.team,
         position: item.position,
@@ -503,6 +497,7 @@ submitForm() {
                               placeholder="Overall Progress"
                               value={this.state.singleFields.overall_progress}
                               onChange={this.handleChange}
+                              readOnly
                             />
                           </div>
                         </div>
@@ -515,7 +510,7 @@ submitForm() {
                               id="start_date"
                               readOnly
                               class="form-control"
-                              value={this.state.singleFields.start_date}
+                              value={moment(this.state.singleFields.start_date).format("DD-MM-YYYY")}
                             />
                           </div>
                           <div className="form-group col-md-6">
@@ -526,7 +521,7 @@ submitForm() {
                               id="end_date"
                               readOnly
                               class="form-control"
-                              value={this.state.singleFields.end_date}
+                              value={moment(this.state.singleFields.end_date).format("DD-MM-YYYY")}
                             />
                           </div>
                         </div>
@@ -539,29 +534,18 @@ submitForm() {
                           <thead className="thead-dark">
                             <tr>
                               <th>S.No</th>
-                              <th>Team Strength</th>
                               <th>Position</th>
+                              <th>Qualification</th>
                               <th>Emp Code</th>
                               <th>Emp Name</th>
-                              <th>Qualification</th>
+                              <th>Remark</th>
                             </tr>
                           </thead>
                           <tbody id="tbl">
                             {this.state.team_strength.map((item, idx) => (
                               <tr key={"ts-" + idx}>
                                 <td> {idx+1} </td>
-                                <td>
-                                  <input
-                                    type="text"
-                                    className="form-control"
-                                    id="team"
-                                    readOnly
-                                    placeholder="Team strength"
-                                    name="team"
-                                    onChange={(evnt) =>this.handleChangeMul(idx,evnt,"teamStrength")}
-                                    value={item.team}
-                                  />
-                                </td>
+                                
                                 <td>
                                   <input
                                     type="text"
@@ -574,7 +558,18 @@ submitForm() {
                                     value={item.position}
                                   />
                                 </td>
-                                
+                                <td>
+                                  <input
+                                    type="text"
+                                    className="form-control"
+                                    id="qualification"
+                                    placeholder="Qualification"
+                                    name="qualification"
+                                    onChange={ (evnt) =>this.handleChangeMul(idx,evnt,"teamStrength") }
+                                    value={item.qualification}
+                                    readOnly
+                                  />
+                                </td>
                                 <td>
                                   <input
                                     type="text"
@@ -597,18 +592,18 @@ submitForm() {
                                     value={item.employee_name}
                                   />
                                 </td>
+                                
                                 <td>
                                   <input
                                     type="text"
                                     className="form-control"
-                                    id="qualification"
-                                    placeholder="Qualification"
-                                    name="qualification"
-                                    onChange={ (evnt) =>this.handleChangeMul(idx,evnt,"teamStrength") }
-                                    value={item.qualification}
+                                    id="team"
+                                    placeholder="Remark"
+                                    name="team"
+                                    onChange={(evnt) =>this.handleChangeMul(idx,evnt,"teamStrength")}
+                                    value={item.team}
                                   />
                                 </td>
-                                
                               </tr>
                             ))}
                           </tbody>
@@ -818,8 +813,8 @@ submitForm() {
                           <thead className="thead-dark">
                             <tr>
                               <th style={{ width: "230px" }}>Type</th>
-                              <th>Start Date</th>
-                              <th>End Date</th>
+                              <th style={{ width: "200px" }}>Start Date</th>
+                              <th style={{ width: "200px" }}>End Date</th>
                               <th> Duration <small>in days</small> </th>
                               <th style={{ width: "200px" }}>Status</th>
                               <th style={{ width: "200px" }}> Progress</th>
@@ -851,7 +846,7 @@ submitForm() {
                                   readOnly
                                   name="start_date"
                                   onChange={ (evnt) =>this.handleChangeMul(idx,evnt,"project_activities") }
-                                  value={item.start_date}
+                                  value={moment(item.start_date).format("DD-MM-YYYY")}
                                 />
                               </td>
                               <td>
@@ -862,7 +857,7 @@ submitForm() {
                                   readOnly
                                   name="end_date"
                                   onChange={ (evnt) =>this.handleChangeMul(idx,evnt,"project_activities") }
-                                  value={item.end_date}
+                                  value={moment(item.end_date).format("DD-MM-YYYY")}
                                 />
                               </td>
                               <td>
@@ -941,7 +936,8 @@ submitForm() {
                                   placeholder="Date"
                                   name="other_date"
                                   onChange={ (evnt) =>this.handleChangeMul(idx,evnt,"other_activities") }
-                                  value={item.other_date}
+                                 
+                                  value={moment(item.other_date).format("DD-MM-YYYY")}
                                 />
                               </td>
 
@@ -967,7 +963,7 @@ submitForm() {
                       </div>
                       <div className="card-footer">
                       <button type="button" className="btn btn-primary" onClick={this.submitForm}>
-                          Submit
+                          Update
                         </button>
                         </div>
                         <div className="col-md-9">

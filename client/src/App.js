@@ -19,7 +19,8 @@ class App extends Component {
       <Route path={"/"}  element={<Login/>} ></Route>
       <Route path={"/register"}  element={<Register/>} ></Route> */}
       <Route path={"/admin/dashboard"}  element={<Dashboard/>} ></Route>
-      <Route path={"/admin/centre-name"}  element={<Centre/>} ></Route>
+      <Route path={"/admin/centre"}  element={<Centre/>} ></Route>
+      <Route path={"/admin/centre-edit/:id"}  element={<Centre/>} ></Route>
       <Route path={"/admin/funding-agency"}  element={<FundingAgancy/>} ></Route>
       <Route path={"/admin/project-detail"}  element={<ProjectDetail/>} ></Route>
       <Route path={"/admin/team-leader"}  element={<TeamLeader/>} ></Route>

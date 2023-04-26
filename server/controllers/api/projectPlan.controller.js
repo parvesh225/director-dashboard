@@ -1,5 +1,6 @@
 const { ProjectPlan } = require("../../models/ProjectPlan");
 const { TeamStrength } = require("../../models/TeamStrength");
+const { Team } = require("../../models/Team");
 const { Finances } = require("../../models/Finances");
 const { FinanceBudget } = require("../../models/FinanceBudget");
 const { ProjectActivitie } = require("../../models/ProjectActivitie");
@@ -68,6 +69,20 @@ async function insert(req, res, next) {
         })
       }
     }
+
+    //Team
+    if (req.body.team_strength) {
+      for (var i = 0; i < req.body.team_strength.length; i++) {
+        await Team.create({
+          "project_plan_id": project.id,
+          "team": req.body.team_strength[i].team,
+          "position": req.body.team_strength[i].position,
+          "experience": req.body.team_strength[i].experience,
+          "qualification": req.body.team_strength[i].qualification,
+          "salary_slab": req.body.team_strength[i].salary_slab
+        })
+      }
+    }
     // Finances
     if (req.body.finances) {
       for (var i = 0; i < req.body.finances.length; i++) {
@@ -102,8 +117,8 @@ async function insert(req, res, next) {
 
         await OtherActivitie.create({
           "project_plan_id": project.id,
-          "activities": req.body.other_activities[i].other_activity,
-          "date": req.body.other_activities[i].other_date
+          "activities": req.body.other_activities[i].other_activity  ? req.body.other_activities[i].other_activity: "",
+          "date": req.body.other_activities[i].other_date ? req.body.other_activities[i].other_date : "0000-00-00 00:00:00" 
         })
       }
     }
@@ -147,15 +162,15 @@ async function edit(req, res, next) {
 
     if (req.body.team_strength) {
       for (var i = 0; i < req.body.team_strength.length; i++) {
-        const ts = await TeamStrength.findOne({
+        const ts = await Team.findOne({
           where: {
              id: req.body.team_strength[i].id
           }
         })
         await ts.update({
           "employee_name": req.body.team_strength[i].employee_name,
-          "qualification": req.body.team_strength[i].qualification,
-          "employee_code": req.body.team_strength[i].employee_code
+          "employee_code": req.body.team_strength[i].employee_code,
+          "team": req.body.team_strength[i].team,
         })
       }
     }
@@ -194,7 +209,7 @@ async function edit(req, res, next) {
     // Success Message Return
     return res.status(200).json({
       "status": true,
-      "message": "Data edited successfully!"
+      "message": "Data update successfully!"
     });
     // Error Message Return
   } catch (error) {
@@ -231,8 +246,8 @@ async function fetchProjectPlan(req, res, next) {
 
     // End Find Years List
 
-    //Team strength
-    let teams = await TeamStrength.findAll({
+    //Team 
+    let teams = await Team.findAll({
       where: { project_plan_id: `${project.id}` }
     });
 
@@ -242,6 +257,7 @@ async function fetchProjectPlan(req, res, next) {
     let project_activity = await ProjectActivitie.findAll({
       where: { project_plan_id: `${project.id}` }
     });
+
     //Other Activity
     let other_activity = await OtherActivitie.findAll({
       where: { project_plan_id: `${project.id}` }

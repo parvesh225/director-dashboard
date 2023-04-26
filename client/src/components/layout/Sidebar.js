@@ -52,7 +52,7 @@ class Sidebar extends Component {
 
                                         <li className="nav-item">
                                             <Link
-                                                to="/admin/centre-name"
+                                                to="/admin/centre"
                                                 className="nav-link"
                                             >
                                                 <i className="far fa-circle nav-icon" /> Centre Name
