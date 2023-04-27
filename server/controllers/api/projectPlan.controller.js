@@ -9,6 +9,7 @@ const { Centre } = require("../../models/Centre");
 const { Project } = require("../../models/Project");
 const { TeamLeader } = require("../../models/TeamLeader");
 const { FundingAgency } = require("../../models/FundingAgency");
+const { FinanceRecieved } = require("../../models/FinanceRecieved");
 
 async function fetchMasterData(req, res, next) {
   try {
@@ -117,8 +118,8 @@ async function insert(req, res, next) {
 
         await OtherActivitie.create({
           "project_plan_id": project.id,
-          "activities": req.body.other_activities[i].other_activity  ? req.body.other_activities[i].other_activity: "",
-          "date": req.body.other_activities[i].other_date ? req.body.other_activities[i].other_date : "0000-00-00 00:00:00" 
+          "activities": req.body.other_activities[i].other_activity,
+          "date": req.body.other_activities[i].other_date
         })
       }
     }
@@ -388,6 +389,34 @@ async function saveProjectPlanFinancesBudget(req, res, next) {
     
 }
 
+async function financeRecieved (req, res, next) {
+  try{
+    for (var i = 0; i < req.body.finance_recieved.length; i++) {
+      await FinanceRecieved.create({
+        "project_plan_id": req.body.finance_recieved[i].project_plan_id,
+        "year": req.body.finance_recieved[i].year,
+        "amount_recieved": req.body.finance_recieved[i].amount_recieved,
+        "amount_recieved_date": req.body.finance_recieved[i].amount_recieved_date,
+        "amount_remark": req.body.finance_recieved[i].amount_remark
+      })
+    }
+    return res.status(200).json({
+      status:true,
+      message:" Finance data saved successfully!"
+    })
+  }catch(err) {
+    return res.status(500).json({
+      status:false,
+      message: " * All fields are mandatory please fill"
+    })
+  }
+
+  
+  return res.status(200).json({
+    status:true,
+    data: req.body
+  })
+}
 module.exports = {
   insert,
   fetchMasterData,
@@ -395,5 +424,6 @@ module.exports = {
   projectPlanList,
   fetchProjectPlanFinances,
   saveProjectPlanFinancesBudget,
-  edit
+  edit,
+  financeRecieved
 }

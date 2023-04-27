@@ -73,16 +73,15 @@ class ProjectPlan extends Component {
     this.submitForm = this.submitForm.bind(this);
     this.diffDays = this.diffDays.bind(this);
   }
-  diffDays(date1, date2)
-{
-  var date1 = new Date(date1);
+  diffDays(date1, date2) {
+    var date1 = new Date(date1);
     var date2 = new Date(date2);
-     
+
     var Difference_In_Time = date2.getTime() - date1.getTime();
     var Difference_In_Days = Difference_In_Time / (1000 * 3600 * 24);
-  
-   return  Difference_In_Days;
-}
+
+    return Difference_In_Days;
+  }
 
   componentDidMount() {
     axios.get(process.env.REACT_APP_BASE_URL + "/api/admin/fetch-master-data")
@@ -145,8 +144,6 @@ class ProjectPlan extends Component {
   }
 
 
-
-
   // For simple fields
   handleChange(e) {
     let singleField = this.state.singleFields;
@@ -172,14 +169,14 @@ class ProjectPlan extends Component {
         finances: finances,
       });
     } else if (type === "project_activities") {
-      
+
       const { name, value } = e.target;
       const project_activities = this.state.project_activities;
       project_activities[idx][name] = value;
 
       var startDate = this.state.project_activities[idx]['start_date'];
       var endDate = this.state.project_activities[idx]['end_date'];
-      if(startDate && endDate) {
+      if (startDate && endDate) {
         var days = this.diffDays(startDate, endDate);
         project_activities[idx]['duration'] = days;
       }
@@ -187,9 +184,9 @@ class ProjectPlan extends Component {
         project_activities: project_activities,
       });
 
-      
 
-     
+
+
 
     } else if (type === "other_activities") {
       const { name, value } = e.target;
@@ -303,15 +300,15 @@ class ProjectPlan extends Component {
                     <div className="card-header">
                       <h3 className="card-title"> Project Form-I </h3>
                     </div>
-                    <form> 
-                    
+                    <form>
+
                       <div className="card-body">
                         <div className="row">
                           <div className="col-md-6">
                             <div className="form-group">
                               <label htmlFor="centreName">Centre Name </label>
                               {/* {JSON.stringify(this.state.singleFields.centre_name)}ssss */}
-                             
+
                               <select
                                 class="form-control "
                                 name="centre_name"
@@ -476,7 +473,7 @@ class ProjectPlan extends Component {
                               onChange={this.handleChange}
                             />
                           </div> */}
-                           <div className="form-group col-md-6">
+                          <div className="form-group col-md-6">
                             <label for="startDate">Start Date</label>
                             <input
                               type="date"
@@ -489,7 +486,7 @@ class ProjectPlan extends Component {
                           </div>
                         </div>
                         <div className="row">
-                         
+
                           <div className="form-group col-md-6">
                             <label for="endDate">End Date</label>
                             <input
@@ -520,18 +517,6 @@ class ProjectPlan extends Component {
                             {this.state.team_strength.map((item, idx) => (
                               <tr key={"ts-" + idx}>
                                 <td>{idx + 1}</td>
-                                {/* <td>
-                                  <input
-                                  key={idx}
-                                    type="text"
-                                    className="form-control"
-                                    id="team"
-                                    placeholder="Integer value"
-                                    name="team"
-                                    onChange={(evnt) =>this.handleChangeMul(idx,evnt,"teamStrength")}
-                                    value={item.team}
-                                  />
-                                </td> */}
                                 <td>
                                   <input
                                     type="text"
@@ -623,17 +608,27 @@ class ProjectPlan extends Component {
                                     value={item.year}
                                   />
                                 </td>
-                               
                                 <td>
-                                <input
-                                    type="text"
-                                    className="form-control"
-                                    id="budget_head"
-                                    placeholder="Budget head"
+                                  <select
+                                    class="form-control"
                                     name="budget_head"
+                                    id="budget_head"
                                     onChange={(evnt) => this.handleChangeMul(idx, evnt, "finances")}
                                     value={item.budget_head}
-                                  />
+                                  >
+                                    <option selected="selected"> select </option>
+                                    <option value="hr cost">HR Cost</option>
+                                    <option value="travel cost">
+                                      Travel Cost
+                                    </option>
+                                    <option value="infrastructure cost">
+                                      Infrastructure Cost
+                                    </option>
+                                    <option value="Miscellaneous cost">
+                                      Miscellaneous Cost
+                                    </option>
+                                    <option value="a&o">A&O</option>
+                                  </select>
                                 </td>
                                 <td>
                                   <input
