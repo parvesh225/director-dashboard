@@ -492,7 +492,7 @@ submitForm() {
                               <label htmlFor="centreName">Centre Name </label>
                               
                               <select
-                                class="form-control "
+                                className="form-control "
                                 name="centre_name"
                                 id="centre_name"
                                 value={this.state.singleFields.centre_name}
@@ -508,7 +508,7 @@ submitForm() {
                               <label htmlFor="projectName">Project Name</label>
                               
                                <select
-                                class="form-control "
+                                className="form-control "
                                 name="project_name"
                                 id="project_name"
                                 value={this.state.singleFields.project_name}
@@ -528,7 +528,7 @@ submitForm() {
                               </label>
                              
                                <select
-                                class="form-control "
+                                className="form-control "
                                 name="team_head"
                                 id="team_head"
                                 value={this.state.singleFields.project_head}
@@ -541,12 +541,12 @@ submitForm() {
                           </div>
 
                           <div className="form-group col-md-6">
-                            <label for="fundingMinistry/Agency/Dept">
+                            <label htmlFor="fundingMinistry/Agency/Dept">
                               Funding Ministry/Agency/Dept.
                             </label>
                            
                              <select
-                              class="form-control "
+                              className="form-control "
                               name="funding_ministry"
                               id="funding_ministry"
                               value={this.state.singleFields.funding_agency}
@@ -655,7 +655,7 @@ submitForm() {
                               name="start_date"
                               id="start_date"
                               readOnly
-                              class="form-control"
+                              className="form-control"
                               value={this.state.singleFields.start_date}
                             />
                           </div>
@@ -666,15 +666,15 @@ submitForm() {
                               name="end_date"
                               id="end_date"
                               readOnly
-                              class="form-control"
+                              className="form-control"
                               value={this.state.singleFields.end_date}
                             />
                           </div>
                         </div>
 
                         <p className="lead"> Team Strength </p>
-                        <div class="hack1">
-                          <div class="hack2 scroll">
+                        <div className="hack1">
+                          <div className="hack2 scroll">
 
                         <table className="table">
                           <thead className="thead-dark">
@@ -704,7 +704,7 @@ submitForm() {
                             <div className="form-group">
                               <label htmlFor="centreName">Choose Year </label>
                               <select
-                                class="form-control "
+                                className="form-control "
                                 name="year"
                                 id="year"
                                 value={this.state.selectedYear}
@@ -719,7 +719,7 @@ submitForm() {
                             <div className="form-group">
                               <label htmlFor="projectName">Choose activities</label>
                               <select
-                                class="form-control "
+                                className="form-control "
                                 name="project_name"
                                 id="project_name"
                                 value={this.state.selectedQuarter}
@@ -747,8 +747,8 @@ submitForm() {
                           </div>
 
                         </div>
-                        <div class="hack1">
-                          <div class="hack2 scroll">
+                        <div className="hack1">
+                          <div className="hack2 scroll">
                           <table className="table">
                           <thead className="thead-dark">
                             <tr>
@@ -892,8 +892,8 @@ submitForm() {
                        
 
                         <p className="lead"> Project Activities </p>
-                        <div class="hack1">
-                          <div class="hack2 scroll">
+                        <div className="hack1">
+                          <div className="hack2 scroll">
 
                           <table className="table">
                           <thead className="thead-dark">
@@ -911,7 +911,7 @@ submitForm() {
                                <tr key={"pa-" + idx}>
                               <td>
                                 <select
-                                  class="form-control select2 select2-hidden-accessible"
+                                  className="form-control select2 select2-hidden-accessible"
                                   name="type"
                                   id="type"
                                   readOnly
@@ -987,8 +987,8 @@ submitForm() {
                         </div>
 
                         <p className="lead"> Other Activities </p>
-                        <div class="hack1">
-                          <div class="hack2 scroll">
+                        <div className="hack1">
+                          <div className="hack2 scroll">
 
                           <table className="table">
                           <thead className="thead-dark">

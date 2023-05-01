@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import Footer from "../layout/Footer";
 import Header from "../layout/Header";
 import Sidebar from "../layout/Sidebar";
-import ProjectPlan2 from './ProjectPlan2.css';
+import './ProjectPlan2.css';
 const axios = require("axios").default;
 
 class ProjectPlan extends Component {
@@ -72,10 +72,65 @@ class ProjectPlan extends Component {
     this.handleRemoveSpecificRow = this.handleRemoveSpecificRow.bind(this);
     this.submitForm = this.submitForm.bind(this);
     this.diffDays = this.diffDays.bind(this);
+    this.blankForm = this.blankForm.bind(this);
   }
-  diffDays(date1, date2) {
-    var date1 = new Date(date1);
-    var date2 = new Date(date2);
+
+  blankForm(){
+    var singleFields = {
+      centre_name: "",
+      project_name: "",
+      team_head: "",
+      funding_ministry: "",
+      project_brief: "",
+      work_order: "",
+      nodal_officer: "",
+      contact_no: "",
+      allocated_budget: "",
+      start_date: "",
+      end_date: "",
+      overall_progress: "",
+    }
+    var team_strength= [
+      {
+        team: "",
+        position: "",
+        experience: "",
+        qualification: "",
+        salary_slab: "",
+      },
+    ]
+    var finances= [
+      {
+        year: "",
+        budget_head: "",
+        allocated_fund: "",
+        milestone: "",
+      },
+    ]
+    var project_activities = [
+      {
+        type: "",
+        start_date: "",
+        end_date: "",
+        duration: "",
+        activities: "",
+        remarks: "",
+      },
+    ]
+
+    var other_activities = [
+      {
+        other_activity: "",
+        other_date: "",
+      },
+    ]
+    this.setState({singleFields: singleFields, team_strength: team_strength,
+    finances: finances, project_activities: project_activities,
+  other_activities: other_activities})
+  }
+  diffDays(date3, date4) {
+    var date1 = new Date(date3);
+    var date2 = new Date(date4);
 
     var Difference_In_Time = date2.getTime() - date1.getTime();
     var Difference_In_Days = Difference_In_Time / (1000 * 3600 * 24);
@@ -86,7 +141,6 @@ class ProjectPlan extends Component {
   componentDidMount() {
     axios.get(process.env.REACT_APP_BASE_URL + "/api/admin/fetch-master-data")
       .then((response) => {
-        var centre_name = this.state.singleFields.centre_name;
         var centre = response.data.centres
         var project = response.data.projects
         var team = response.data.teams
@@ -129,6 +183,7 @@ class ProjectPlan extends Component {
         resStatus.isError = true;
         resStatus.messages = data.message;
         thizz.setState({ resStatus: resStatus });
+        thizz.blankForm();
       }
 
     }).catch(function (error) {
@@ -285,7 +340,7 @@ class ProjectPlan extends Component {
       return <option key={agency.id} value={agency.agency_code}>  {agency.agency_name} </option>
     })
 
-    var nDays = this.diffDays(new Date(), new Date());
+    // var nDays = this.diffDays(new Date(), new Date());
     return (
       <>
         <Header />
@@ -310,7 +365,7 @@ class ProjectPlan extends Component {
                               {/* {JSON.stringify(this.state.singleFields.centre_name)}ssss */}
 
                               <select
-                                class="form-control "
+                                className="form-control "
                                 name="centre_name"
                                 id="centre_name"
                                 value={this.state.singleFields.centre_name}
@@ -325,7 +380,7 @@ class ProjectPlan extends Component {
                             <div className="form-group">
                               <label htmlFor="projectName">Project Name </label>
                               <select
-                                class="form-control "
+                                className="form-control "
                                 name="project_name"
                                 id="project_name"
                                 value={this.state.singleFields.project_name}
@@ -344,7 +399,7 @@ class ProjectPlan extends Component {
                                 Project Head Name
                               </label>
                               <select
-                                class="form-control "
+                                className="form-control "
                                 name="team_head"
                                 id="team_head"
                                 value={this.state.singleFields.team_head}
@@ -374,7 +429,7 @@ class ProjectPlan extends Component {
                               Funding Ministry/Agency/Dept.
                             </label>
                             <select
-                              class="form-control "
+                              className="form-control "
                               name="funding_ministry"
                               id="funding_ministry"
                               value={this.state.singleFields.funding_ministry}
@@ -387,7 +442,7 @@ class ProjectPlan extends Component {
                         </div>
                         <div className="row ">
                           <div className="form-group col-md-6">
-                            <label for="projectBrief" className="p">
+                            <label htmlFor="projectBrief" className="p">
                               Project Brief
                             </label>
                             <textarea
@@ -401,7 +456,7 @@ class ProjectPlan extends Component {
                           </div>
 
                           <div className="form-group col-md-6">
-                            <label for="workOrderNo" className="p">
+                            <label htmlFor="workOrderNo" className="p">
                               Work Order No
                             </label>
                             <input
@@ -420,7 +475,7 @@ class ProjectPlan extends Component {
 
 
                           <div className="form-group col-md-6">
-                            <label for="nodalOfficerName" className="p">
+                            <label htmlFor="nodalOfficerName" className="p">
                               Nodal Officer Name
                             </label>
                             <input
@@ -434,7 +489,7 @@ class ProjectPlan extends Component {
                             />
                           </div>
                           <div className="form-group col-md-6">
-                            <label for="contactNo">Contact no.</label>
+                            <label htmlFor="contactNo">Contact no.</label>
                             <input
                               type="text"
                               className="form-control"
@@ -479,7 +534,7 @@ class ProjectPlan extends Component {
                               type="date"
                               name="start_date"
                               id="start_date"
-                              class="form-control"
+                              className="form-control"
                               value={this.state.singleFields.start_date}
                               onChange={this.handleChange}
                             />
@@ -488,12 +543,12 @@ class ProjectPlan extends Component {
                         <div className="row">
 
                           <div className="form-group col-md-6">
-                            <label for="endDate">End Date</label>
+                            <label htmlFor="endDate">End Date</label>
                             <input
                               type="date"
                               name="end_date"
                               id="end_date"
-                              class="form-control"
+                              className="form-control"
                               value={this.state.singleFields.end_date}
                               onChange={this.handleChange}
                             />
@@ -505,7 +560,7 @@ class ProjectPlan extends Component {
                           <thead className="thead-dark">
                             <tr>
                               <th>S.No</th>
-                              {/* <th>Team Strength</th> */}
+                              <th>Team Length</th>
                               <th>Position</th>
                               <th>Experience</th>
                               <th>Qualification</th>
@@ -517,6 +572,17 @@ class ProjectPlan extends Component {
                             {this.state.team_strength.map((item, idx) => (
                               <tr key={"ts-" + idx}>
                                 <td>{idx + 1}</td>
+                                <td>
+                                <input
+                                    type="text"
+                                    className="form-control"
+                                    id="Team Strength"
+                                    placeholder="Team Strength"
+                                    name="team"
+                                    onChange={(evnt) => this.handleChangeMul(idx, evnt, "teamStrength")}
+                                    value={item.team}
+                                  />
+                                </td>
                                 <td>
                                   <input
                                     type="text"
@@ -609,26 +675,16 @@ class ProjectPlan extends Component {
                                   />
                                 </td>
                                 <td>
-                                  <select
-                                    class="form-control"
-                                    name="budget_head"
+                                <input
+                                    type="text"
+                                    className="form-control"
                                     id="budget_head"
+                                    placeholder="Budget Head"
+                                    name="budget_head"
                                     onChange={(evnt) => this.handleChangeMul(idx, evnt, "finances")}
                                     value={item.budget_head}
-                                  >
-                                    <option selected="selected"> select </option>
-                                    <option value="hr cost">HR Cost</option>
-                                    <option value="travel cost">
-                                      Travel Cost
-                                    </option>
-                                    <option value="infrastructure cost">
-                                      Infrastructure Cost
-                                    </option>
-                                    <option value="Miscellaneous cost">
-                                      Miscellaneous Cost
-                                    </option>
-                                    <option value="a&o">A&O</option>
-                                  </select>
+                                  />
+                                  
                                 </td>
                                 <td>
                                   <input
@@ -692,7 +748,7 @@ class ProjectPlan extends Component {
                               <tr key={"pa-" + idx}>
                                 <td>
                                   <select
-                                    class="form-control select2 select2-hidden-accessible"
+                                    className="form-control select2 select2-hidden-accessible"
                                     name="type"
                                     id="type"
                                     onChange={(evnt) => this.handleChangeMul(idx, evnt, "project_activities")}

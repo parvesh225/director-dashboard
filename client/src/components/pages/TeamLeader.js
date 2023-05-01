@@ -144,7 +144,7 @@ class TeamLeader extends Component {
                                                                 <td>{employee.employee_code}</td>
                                                                 <td>{employee.employee_name}</td>
                                                                
-                                                                <td><i className="fa fa-trash text-danger mr-2" aria-hidden="true"></i> <i class="fa fa-pencil-square-o text-primary" aria-hidden="true" ></i></td>
+                                                                <td><i className="fa fa-trash text-danger mr-2" aria-hidden="true"></i> <i className="fa fa-pencil-square-o text-primary" aria-hidden="true" ></i></td>
                                                             </tr>
                                                         ))
                                                         :

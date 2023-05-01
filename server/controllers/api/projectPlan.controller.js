@@ -38,8 +38,31 @@ async function fetchMasterData(req, res, next) {
 }
 
 async function insert(req, res, next) {
-  //transaction begin
-  //   const t = await db.transaction();
+  
+  if(!req.body.team_strength) {
+    return res.status(500).json({
+      "status": false,
+      "message": "Team Strength is required"
+    })
+  }
+  
+  if(req.body.team_strength) {
+    var isValid = true;
+    for (var i = 0; i < req.body.team_strength.length; i++) { 
+      var obj = req.body.team_strength[i];
+
+      if(!obj.team || !obj.position || !obj.experience || !obj.qualification || !obj.salary_slab) {
+        isValid = false;
+      }
+    }
+    if( !isValid) {
+      return res.status(500).json({
+        "status": false,
+        "message": "Invalid data in team strength"
+      })
+    }
+  }
+
   try {
     let project = await ProjectPlan.create({
       centre_name: req.body.FormData.centre_name,
@@ -62,7 +85,7 @@ async function insert(req, res, next) {
       for (var i = 0; i < req.body.team_strength.length; i++) {
         await TeamStrength.create({
           "project_plan_id": project.id,
-          "team": req.body.team_strength[i].team,
+          "team": req.body.team_strength[i].team, //number of team
           "position": req.body.team_strength[i].position,
           "experience": req.body.team_strength[i].experience,
           "qualification": req.body.team_strength[i].qualification,
@@ -72,18 +95,18 @@ async function insert(req, res, next) {
     }
 
     //Team
-    if (req.body.team_strength) {
-      for (var i = 0; i < req.body.team_strength.length; i++) {
-        await Team.create({
-          "project_plan_id": project.id,
-          "team": req.body.team_strength[i].team,
-          "position": req.body.team_strength[i].position,
-          "experience": req.body.team_strength[i].experience,
-          "qualification": req.body.team_strength[i].qualification,
-          "salary_slab": req.body.team_strength[i].salary_slab
-        })
-      }
-    }
+    // if (req.body.team_strength) {
+    //   for (var i = 0; i < req.body.team_strength.length; i++) {
+    //     await Team.create({
+    //       "project_plan_id": project.id,
+    //       "team": req.body.team_strength[i].team, //number of team
+    //       "position": req.body.team_strength[i].position,
+    //       "experience": req.body.team_strength[i].experience,
+    //       "qualification": req.body.team_strength[i].qualification,
+    //       "salary_slab": req.body.team_strength[i].salary_slab
+    //     })
+    //   }
+    // }
     // Finances
     if (req.body.finances) {
       for (var i = 0; i < req.body.finances.length; i++) {
@@ -115,12 +138,14 @@ async function insert(req, res, next) {
     //Other Activities
     if (req.body.other_activities) {
       for (var i = 0; i < req.body.other_activities.length; i++) {
-
-        await OtherActivitie.create({
-          "project_plan_id": project.id,
-          "activities": req.body.other_activities[i].other_activity,
-          "date": req.body.other_activities[i].other_date
-        })
+        var eachAct = req.body.other_activities[i]
+        if(eachAct && eachAct.date && eachAct.activities){
+          await OtherActivitie.create({
+            "project_plan_id": project.id,
+            "activities": req.body.other_activities[i].other_activity,
+            "date": req.body.other_activities[i].other_date
+          })
+        }
       }
     }
 
@@ -162,19 +187,28 @@ async function edit(req, res, next) {
     // Team Strength
 
     if (req.body.team_strength) {
+      //delete all team
+      const ts = await Team.destroy({
+        where: {
+          project_plan_id: projectPlan.id
+        }
+      })
       for (var i = 0; i < req.body.team_strength.length; i++) {
-        const ts = await Team.findOne({
-          where: {
-             id: req.body.team_strength[i].id
-          }
-        })
-        await ts.update({
-          "employee_name": req.body.team_strength[i].employee_name,
-          "employee_code": req.body.team_strength[i].employee_code,
-          "team": req.body.team_strength[i].team,
-        })
+        await Team.create({
+                "project_plan_id": projectPlan.id,
+                "team_strength_id": req.body.team_strength[i].team_strength_id,
+                "position": req.body.team_strength[i].position,
+                "experience": req.body.team_strength[i].experience,
+                "qualification": req.body.team_strength[i].qualification,
+                "salary_slab": req.body.team_strength[i].salary_slab,
+                "employee_name": req.body.team_strength[i].employee_name,
+                "employee_code": req.body.team_strength[i].employee_code,
+                "remark": req.body.team_strength[i].remark
+              })
+       
       }
     }
+
     // Project Activities
     if (req.body.project_activities) {
       for (var i = 0; i < req.body.project_activities.length; i++) {
@@ -186,6 +220,21 @@ async function edit(req, res, next) {
         await ts.update({
           "status": req.body.project_activities[i].status,
           "progress": req.body.project_activities[i].progress
+        })
+      }
+    }
+
+    if (req.body.finances) {
+      for (var i = 0; i < req.body.finances.length; i++) {
+        const ts = await Finances.findOne({
+          where: {
+             id: req.body.finances[i].finance_id
+          }
+        })
+       
+        await ts.update({
+          "expenditure": req.body.finances[i].expenditure,
+          
         })
       }
     }
@@ -203,9 +252,29 @@ async function edit(req, res, next) {
           "date": req.body.other_activities[i].date
         })
       }
-
     }
 
+    if(req.body.finance_recieved) {
+      
+      var year = req.body.finance_recieved[0].year;
+      
+      const ts = await FinanceRecieved.destroy({
+        where: {
+          project_plan_id: projectPlan.id,
+          year: year
+        }
+      })
+      for (var i = 0; i < req.body.finance_recieved.length; i++) {
+        await FinanceRecieved.create({
+          "project_plan_id": req.body.finance_recieved[i].project_plan_id,
+          "year": req.body.finance_recieved[i].year,
+          "amount_recieved": req.body.finance_recieved[i].amount_recieved,
+          "amount_recieved_date": req.body.finance_recieved[i].amount_recieved_date,
+          "amount_remark": req.body.finance_recieved[i].amount_remark
+        })
+      }
+    }
+    
 
     // Success Message Return
     return res.status(200).json({
@@ -252,6 +321,10 @@ async function fetchProjectPlan(req, res, next) {
       where: { project_plan_id: `${project.id}` }
     });
 
+    let teamStrength = await TeamStrength.findAll({
+      where: {project_plan_id: `${project.id}`}
+    })
+
 
 
     //Project Activity
@@ -282,8 +355,8 @@ async function fetchProjectPlan(req, res, next) {
       centres: centres,
       projects: projects,
       team_leader: team_leader,
-      agencys: agencys
-
+      agencys: agencys,
+      teamStrength: teamStrength  
     });
 
   } catch (error) {
@@ -333,9 +406,22 @@ let finances =await Finances.findAll({
         project_plan_id: projectPlanId
     }
 })
+let finance_received =await FinanceRecieved.findAll({
+  where: {
+      year: year,
+      project_plan_id: projectPlanId
+  }
+})
+let total = 0.00
+finances.forEach(element => {
+  total += element.allocated_fund
+});
+
 return res.status(200).json({
   "status": true,
-  "finances": finances
+  "finances": finances,
+  "finance_received" :finance_received,
+  "total": total
 });
 
 } catch (error) {
@@ -389,34 +475,27 @@ async function saveProjectPlanFinancesBudget(req, res, next) {
     
 }
 
-async function financeRecieved (req, res, next) {
-  try{
-    for (var i = 0; i < req.body.finance_recieved.length; i++) {
-      await FinanceRecieved.create({
-        "project_plan_id": req.body.finance_recieved[i].project_plan_id,
-        "year": req.body.finance_recieved[i].year,
-        "amount_recieved": req.body.finance_recieved[i].amount_recieved,
-        "amount_recieved_date": req.body.finance_recieved[i].amount_recieved_date,
-        "amount_remark": req.body.finance_recieved[i].amount_remark
-      })
-    }
-    return res.status(200).json({
-      status:true,
-      message:" Finance data saved successfully!"
-    })
-  }catch(err) {
-    return res.status(500).json({
-      status:false,
-      message: " * All fields are mandatory please fill"
-    })
-  }
+// async function financeRecieved (req, res, next) {
+//   try{
+    
+//     return res.status(200).json({
+//       status:true,
+//       message:" Finance data saved successfully!"
+//     })
+//   }catch(err) {
+//     return res.status(500).json({
+//       status:false,
+//       message: " * All fields are mandatory please fill"
+//     })
+//   }
 
   
-  return res.status(200).json({
-    status:true,
-    data: req.body
-  })
-}
+//   return res.status(200).json({
+//     status:true,
+//     data: req.body
+//   })
+// }
+
 module.exports = {
   insert,
   fetchMasterData,
@@ -424,6 +503,5 @@ module.exports = {
   projectPlanList,
   fetchProjectPlanFinances,
   saveProjectPlanFinancesBudget,
-  edit,
-  financeRecieved
+  edit
 }

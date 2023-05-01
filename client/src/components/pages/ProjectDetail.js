@@ -142,7 +142,7 @@ class ProjectDetail extends Component {
                                                                 <td>{project.project_code}</td>
                                                                 <td>{project.project_name}</td>
                                                                 
-                                                                <td><i className="fa fa-trash text-danger mr-2" aria-hidden="true"></i> <i class="fa fa-pencil-square-o text-primary" aria-hidden="true" ></i></td>
+                                                                <td><i className="fa fa-trash text-danger mr-2" aria-hidden="true"></i> <i className="fa fa-pencil-square-o text-primary" aria-hidden="true" ></i></td>
                                                             </tr>
                                                         ))
                                                         :

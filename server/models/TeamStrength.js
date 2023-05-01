@@ -16,7 +16,7 @@ TeamStrength.init({
     allowNull: false
   },
   team: {
-    type: DataTypes.STRING,
+    type: DataTypes.INTEGER,
     allowNull: true
   },
   position: {

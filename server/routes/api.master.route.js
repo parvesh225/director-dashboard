@@ -44,7 +44,7 @@ router.delete('/admin/teamleader/:id', teamleaderController.deleteTeamLeader);
 router.get('/admin/fetch-master-data',projectPlanController.fetchMasterData);
 router.get('/admin/project-plan-list',projectPlanController.projectPlanList);
 router.post('/admin/project-plan',projectPlanController.insert);
-router.post('/admin/finance-recieved',projectPlanController.financeRecieved);
+// router.post('/admin/finance-recieved',projectPlanController.financeRecieved);
 
 router.put('/admin/project-plan',projectPlanController.edit);
 router.get('/admin/project-plan/:id',projectPlanController.fetchProjectPlan);

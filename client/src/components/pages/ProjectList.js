@@ -69,8 +69,8 @@ class ProjectList extends Component {
                                             <h3 className="card-title">Project Plan List</h3>
                                         </div>
                                         <div className="card-body mystyle">
-                                        <div class="hack1">
-                                            <div class="hack2 scroll">
+                                        <div className="hack1">
+                                            <div className="hack2 scroll">
                                             <table className="table table-bordered">
                                                 <thead>
 
@@ -90,7 +90,7 @@ class ProjectList extends Component {
                                                                 <td>{idx + 1}</td>
                                                                 <td>
                                                                     <select
-                                                                        class="form-control"
+                                                                        className="form-control"
                                                                         value={project.centre_name}
                                                                         readOnly
                                                                     >
@@ -100,7 +100,7 @@ class ProjectList extends Component {
                                                                 </td>
                                                                 <td>
                                                                     <select
-                                                                        class="form-control"
+                                                                        className="form-control"
                                                                         value={project.project_name}
                                                                         readOnly
                                                                     >
@@ -111,7 +111,7 @@ class ProjectList extends Component {
 
                                                                 <td>
                                                                     <select
-                                                                        class="form-control "
+                                                                        className="form-control "
                                                                         value={project.project_head}
                                                                         readOnly
                                                                     >
@@ -121,7 +121,7 @@ class ProjectList extends Component {
                                                                 </td>
                                                                 <td>
                                                                     <select
-                                                                        class="form-control "
+                                                                        className="form-control "
                                                                         value={project.funding_agency}
                                                                         readOnly
                                                                     >
@@ -133,10 +133,10 @@ class ProjectList extends Component {
                                                                 <td>
 
                                                                     <Link to="/admin/project-plan-edit/23" >
-                                                                        <i class="fa fa-trash text-danger mr-2" aria-hidden="true" ></i>
+                                                                        <i className="fa fa-trash text-danger mr-2" aria-hidden="true" ></i>
                                                                     </Link>
                                                                     <Link to={`/admin/project-plan-edit/${project.id}`} >
-                                                                        <i class="fa fa-pencil-square-o text-primary" aria-hidden="true" ></i>
+                                                                        <i className="fa fa-pencil-square-o text-primary" aria-hidden="true" ></i>
                                                                     </Link>
 
                                                                 </td>

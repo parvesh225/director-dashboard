@@ -144,7 +144,7 @@ class FundingAgency extends Component {
                                                                 <td>{agency.agency_code}</td>
                                                                 <td>{agency.agency_name}</td>
                                                                 
-                                                                <td><i className="fa fa-trash text-danger mr-2" aria-hidden="true"></i> <i class="fa fa-pencil-square-o text-primary" aria-hidden="true" ></i></td>
+                                                                <td><i className="fa fa-trash text-danger mr-2" aria-hidden="true"></i> <i className="fa fa-pencil-square-o text-primary" aria-hidden="true" ></i></td>
                                                             </tr>
                                                         ))
                                                         :

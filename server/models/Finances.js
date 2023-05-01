@@ -32,6 +32,10 @@ Finances.init({
     type: DataTypes.STRING,
     allowNull: false
   },
+  expenditure: {
+    type: DataTypes.INTEGER,
+    allowNull: true
+  },
 
   
 }, {

@@ -85,16 +85,16 @@ class Sidebar extends Component {
 
                                     </ul>
                                 </li>
-                                <li class="nav-item">
-                                    <Link to="/admin/project-plan" class="nav-link">
+                                <li className="nav-item">
+                                    <Link to="/admin/project-plan" className="nav-link">
                                     <i className="nav-icon far fa-image" />
                                         <p>
                                             Add Project 
                                         </p>
                                     </Link>
                                 </li>
-                                <li class="nav-item">
-                                    <Link to="/admin/project-plan-list" class="nav-link">
+                                <li className="nav-item">
+                                    <Link to="/admin/project-plan-list" className="nav-link">
                                     <i className="nav-icon far fa-image" />
                                         <p>
                                             Project Plan List

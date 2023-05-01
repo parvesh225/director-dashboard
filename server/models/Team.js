@@ -16,10 +16,6 @@ Team.init({
     allowNull: false
   },
 
-  team: {
-    type: DataTypes.STRING,
-    allowNull: true
-  },
   position: {
     type: DataTypes.STRING,
     allowNull: true
@@ -48,6 +44,10 @@ Team.init({
     type: DataTypes.STRING,
     allowNull: true
   },
+  team_strength_id: {
+    type: DataTypes.INTEGER,
+    allowNull: true
+  }
 }, {
   // Other model options go here
   sequelize: db, // We need to pass the connection instance

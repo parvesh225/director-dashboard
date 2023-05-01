@@ -44,7 +44,7 @@ class Centre extends Component {
     }
 
     renderElement(){
-        if(this.state.updateCentre == false)
+        if(this.state.updateCentre === false)
            return  <>
             <div className="card card-primary">
            <div className="card-header">
@@ -193,10 +193,10 @@ class Centre extends Component {
                                                                 
                                                                 <td>
                                                                     <Link to="/admin/project-plan-edit/23" >
-                                                                        <i class="fa fa-trash text-danger mr-2" aria-hidden="true" ></i>
+                                                                        <i className="fa fa-trash text-danger mr-2" aria-hidden="true" ></i>
                                                                     </Link>
                                                                     <Link to={`/admin/centre-edit/${centre.id}`} >
-                                                                        <i class="fa fa-pencil-square-o text-primary" aria-hidden="true" ></i>
+                                                                        <i className="fa fa-pencil-square-o text-primary" aria-hidden="true" ></i>
                                                                     </Link>
                                                                 </td>
                                                             </tr>

@@ -69,100 +69,103 @@ class ProjectPlanEdit extends Component {
           amount_recieved: "",
           amount_recieved_date: "",
           amount_remark: "",
-          project_plan_id:"",
-          year:""
+          project_plan_id: "",
+          year: ""
         },
       ],
+      totalAllocatedFund: 0.00,
+      totalActualRecievedFund: 0.00,
+      totalExpenditureFund: 0.00
     }
     this.onChangeYear = this.onChangeYear.bind(this);
     this.handleChangeQuarter = this.handleChangeQuarter.bind(this);
-    this.saveRows = this.saveRows.bind(this)
+    // this.saveRows = this.saveRows.bind(this)
     this.handleChange = this.handleChange.bind(this)
     this.submitForm = this.submitForm.bind(this)
     this.handleChangeMul = this.handleChangeMul.bind(this);
     this.handleAddRow = this.handleAddRow.bind(this);
     this.handleRemoveSpecificRow = this.handleRemoveSpecificRow.bind(this);
-    this.saveAmount = this.saveAmount.bind(this);
+    // this.saveAmount = this.saveAmount.bind(this);
   }
 
-  saveAmount() {
-    var thizz = this;
-    if(!this.state.selectedYear) {
-      alert("Please select year to save")
-      return
-    }
-    var myObj = {
-      finance_recieved: thizz.state.finance_recieved,
-      }
-      axios({
-        method: "post",
-        url: process.env.REACT_APP_BASE_URL + "/api/admin/finance-recieved",
-        data: myObj
-      }).then((response) => {
-        var data = response.data
-        if (data.status === true ) {
-          var resStatusFinanceReceived = thizz.state.resStatusFinanceReceived;
-          resStatusFinanceReceived.isError = true;
-          resStatusFinanceReceived.messages = data.message;
-          thizz.setState({ resStatusFinanceReceived: resStatusFinanceReceived });
-        }
-      
-      }).catch((error)=> {
-        var data = error.response.data;
-        if (error.response.data.status === false) {
-          var resStatusFinanceReceived = thizz.state.resStatusFinanceReceived;
-          resStatusFinanceReceived.messages = data.message;
-          thizz.setState({ resStatusFinanceReceived: resStatusFinanceReceived });
-        }
-      }) 
-  }
+  // saveAmount() {
+  //   var thizz = this;
+  //   if (!this.state.selectedYear) {
+  //     alert("Please select year to save")
+  //     return
+  //   }
+  //   var myObj = {
+  //     finance_recieved: thizz.state.finance_recieved,
+  //   }
+  //   axios({
+  //     method: "post",
+  //     url: process.env.REACT_APP_BASE_URL + "/api/admin/finance-recieved",
+  //     data: myObj
+  //   }).then((response) => {
+  //     var data = response.data
+  //     if (data.status === true) {
+  //       var resStatusFinanceReceived = thizz.state.resStatusFinanceReceived;
+  //       resStatusFinanceReceived.isError = true;
+  //       resStatusFinanceReceived.messages = data.message;
+  //       thizz.setState({ resStatusFinanceReceived: resStatusFinanceReceived });
+  //     }
+
+  //   }).catch((error) => {
+  //     var data = error.response.data;
+  //     if (error.response.data.status === false) {
+  //       var resStatusFinanceReceived = thizz.state.resStatusFinanceReceived;
+  //       resStatusFinanceReceived.messages = data.message;
+  //       thizz.setState({ resStatusFinanceReceived: resStatusFinanceReceived });
+  //     }
+  //   })
+  // }
 
   // For simple fields
   handleChangeQuarter(e) {
     this.setState({ selectedQuarter: e.target.value });
   }
 
-  saveRows() {
-    if (!this.state.selectedQuarter || !this.state.selectedYear) {
-      alert("Please select year and quarter to save")
-      return
-    }
-    var thizz = this
-    for (let i = 0; i < this.state.finances.length; i++) {
-      axios({
-        method: "post",
-        url: process.env.REACT_APP_BASE_URL + "/api/admin/fetch-finances-by-year-project",
-        data: thizz.state.finances[i]
-      }).then((response) => {
-        console.log(response.data)
-        var resp = response.data
-        var msg = ""
-        if (resp.status === 'true' || resp.status === true) {
-          msg = "Successfully Save"
-        } else {
-          msg = resp.message
-        }
-        const finances = this.state.finances;
-        finances[i]['errorMsg'] = msg;
-        console.log(finances)
-        this.setState({
-          finances: finances,
-        });
-      }).catch((error) => {
-        console.log(error.response.data);
-        var resp = error.response.data
-        var msg = ""
-        msg = resp.message
+  // saveRows() {
+  //   if (!this.state.selectedQuarter || !this.state.selectedYear) {
+  //     alert("Please select year and quarter to save")
+  //     return
+  //   }
+  //   var thizz = this
+  //   for (let i = 0; i < this.state.finances.length; i++) {
+  //     axios({
+  //       method: "post",
+  //       url: process.env.REACT_APP_BASE_URL + "/api/admin/fetch-finances-by-year-project",
+  //       data: thizz.state.finances[i]
+  //     }).then((response) => {
+  //       console.log(response.data)
+  //       var resp = response.data
+  //       var msg = ""
+  //       if (resp.status === 'true' || resp.status === true) {
+  //         msg = "Successfully Save"
+  //       } else {
+  //         msg = resp.message
+  //       }
+  //       const finances = this.state.finances;
+  //       finances[i]['errorMsg'] = msg;
+  //       console.log(finances)
+  //       this.setState({
+  //         finances: finances,
+  //       });
+  //     }).catch((error) => {
+  //       console.log(error.response.data);
+  //       var resp = error.response.data
+  //       var msg = ""
+  //       msg = resp.message
 
-        const finances = this.state.finances;
-        finances[i]['errorMsg'] = msg;
-        console.log(finances)
-        this.setState({
-          finances: finances,
-        });
-      })
-    }
-  }
+  //       const finances = this.state.finances;
+  //       finances[i]['errorMsg'] = msg;
+  //       console.log(finances)
+  //       this.setState({
+  //         finances: finances,
+  //       });
+  //     })
+  //   }
+  // }
 
   handleChangeMul(idx, e, type) {
     console.log(idx, e.target.name, type);
@@ -177,8 +180,19 @@ class ProjectPlanEdit extends Component {
       const { name, value } = e.target;
       const finances = this.state.finances;
       finances[idx][name] = value;
+      let total = 0.00
+      finances.forEach(element => {
+        if (element.expenditure && !isNaN(element.expenditure)) {
+          total += parseFloat(element.expenditure)
+        }
+      })
+      if (name === 'expenditure' && total > this.state.totalActualRecievedFund) {
+        alert("Expenditure cannot be more than recieved amounts")
+        return
+      }
       this.setState({
         finances: finances,
+        totalExpenditureFund: total
       });
     } else if (type === "project_activities") {
       const { name, value } = e.target;
@@ -202,14 +216,14 @@ class ProjectPlanEdit extends Component {
     this.setState({ selectedYear: e.target.value })
 
     // for received amount 
-    if(e.target.value) {
+    if (e.target.value) {
       var finance_recieved = this.state.finance_recieved;
       finance_recieved.year = e.target.value;
       this.setState({
         finance_recieved: finance_recieved
       })
     }
-    
+
 
     if (!e.target.value) {
       this.setState({
@@ -230,18 +244,29 @@ class ProjectPlanEdit extends Component {
             allocated_fund: item.allocated_fund,
             milestone: item.milestone,
             quarter: thizz.state.selectedQuarter,
-            received_amt: "",
-            date: "",
-            expenditure: "",
-            balance: "",
-            finance_id: item.id,
-            utilization: "",
-            errorMsg: ""
+            expenditure: item.expenditure,
+            finance_id: item.id
           })
         }
+        let total = 0.00
+        financeesList.forEach(element => {
+          if (element.expenditure && !isNaN(element.expenditure)) {
+            total += parseFloat(element.expenditure)
+          }
+        })
 
+        let total2 = 0.00
+        response.data.finance_received.forEach(element => {
+          if (element.amount_recieved && !isNaN(element.amount_recieved)) {
+            total2 += parseFloat(element.amount_recieved)
+          }
+        })
         this.setState({
-          finances: financeesList
+          finances: financeesList,
+          totalAllocatedFund: response.data.total,
+          totalExpenditureFund: total,
+          totalActualRecievedFund: total2,
+          finance_recieved : response.data.finance_received.length > 0 ? response.data.finance_received : finance_recieved
         })
 
       }).catch((error) => {
@@ -257,7 +282,8 @@ class ProjectPlanEdit extends Component {
       team_strength: thizz.state.team_strength,
       finances: thizz.state.finances,
       project_activities: thizz.state.project_activities,
-      other_activities: thizz.state.other_activities
+      other_activities: thizz.state.other_activities,
+      finance_recieved: thizz.state.finance_recieved
     }
     //Send request to backend
     axios({
@@ -289,9 +315,9 @@ class ProjectPlanEdit extends Component {
     console.log('Props:', this.props.params.id);
     var finance_recieved = this.state.finance_recieved
     finance_recieved.project_plan_id = this.props.params.id
-    
+
     this.setState({
-      finance_recieved:finance_recieved
+      finance_recieved: finance_recieved
     })
 
     axios.get(process.env.REACT_APP_BASE_URL + "/api/admin/project-plan/" + this.props.params.id)
@@ -306,54 +332,81 @@ class ProjectPlanEdit extends Component {
 
         })
 
-
+   
         var financeesList = [];
-        for (let i = 0; i < response.data.teams.length; i++) {
-          var item = response.data.teams[i]
-          financeesList.push({
-            id: item.id,
-            project_plan_id: item.project_plan_id,
-            team: item.team,
-            position: item.position,
-            experience: item.experience,
-            qualification: item.qualification,
-            salary_slab: item.salary_slab,
-            employee_code: item.employee_code,
-            employee_name: item.employee_name,
+        for (let i = 0; i < response.data.teamStrength.length; i++) {
+          var eachItem = response.data.teamStrength[i]
+          var teamLength = eachItem.team
+          var teamByTeamStrength= response.data.teams.filter(
+            function(x){return x.team_strength_id===eachItem.id}
+            )
+            var totalLength  = teamByTeamStrength.length
+            for(let j=0; j< totalLength; j++) {
+              var item = teamByTeamStrength[j]
+              financeesList.push({
+                id: item.id,
+                project_plan_id: item.project_plan_id,
+                remark: item.remark,
+                team_strength_id: eachItem.id,
+                position: item.position,
+                experience: item.experience,
+                qualification: item.qualification,
+                salary_slab: item.salary_slab,
+                employee_code: item.employee_code,
+                employee_name: item.employee_name,
+              })
+            }
 
-          })
+            var pendingTeamCount = teamLength - totalLength;
+            if(pendingTeamCount > 0) {
+              for(let j=0; j< pendingTeamCount; j++) {
+               
+                financeesList.push({
+                  team_strength_id: eachItem.id,
+                  project_plan_id: eachItem.project_plan_id,
+                  remark: "",
+                  position: eachItem.position,
+                  experience: eachItem.experience,
+                  qualification: eachItem.qualification,
+                  salary_slab: eachItem.salary_slab,
+                  employee_code: '',
+                  employee_name: '',
+                })
+              }
+            }
         }
+        //var totalTeamStren
         this.setState({ team_strength: financeesList })
         financeesList = [];
         for (let i = 0; i < response.data.projectActivity.length; i++) {
-          var item = response.data.projectActivity[i]
+          var item2 = response.data.projectActivity[i]
           financeesList.push({
-            id: item.id,
-            type: item.type,
-            start_date: item.start_date,
-            end_date: item.end_date,
-            duration: item.duration,
-            activities: item.activities,
-            remarks: item.remarks,
-            status: item.status,
-            progress: item.progress
+            id: item2.id,
+            type: item2.type,
+            start_date: item2.start_date,
+            end_date: item2.end_date,
+            duration: item2.duration,
+            activities: item2.activities,
+            remarks: item2.remarks,
+            status: item2.status,
+            progress: item2.progress
 
           })
         }
         this.setState({ project_activities: financeesList })
         financeesList = [];
         for (let i = 0; i < response.data.otherActivity.length; i++) {
-          var item = response.data.otherActivity[i]
+          var item3 = response.data.otherActivity[i]
           financeesList.push({
-            id: item.id,
-            other_activity: item.activities,
-            other_date: item.date,
-            status: item.status
+            id: item3.id,
+            other_activity: item3.activities,
+            other_date: item3.date,
+            status: item3.status
           })
         }
         this.setState({ other_activities: financeesList })
       }).catch((error) => {
-        console.log(error.response.data);
+        console.log(error);
       })
 
   }
@@ -367,18 +420,30 @@ class ProjectPlanEdit extends Component {
 
 
   // SET MULTIPLE ROW
-  handleChangeMul(idx, e, type) {
-   
+  handleChangeMul2(idx, e, type) {
+
     if (type === "amountRecieved" && this.state.selectedYear) {
       const { name, value } = e.target;
       const finance_recieved = this.state.finance_recieved;
       finance_recieved[idx][name] = value;
       finance_recieved[idx]['project_plan_id'] = this.props.params.id
       finance_recieved[idx]['year'] = this.state.selectedYear
+      let recievedAmountTotal = 0.00
+      finance_recieved.forEach(element => {
+        if (element.amount_recieved && !isNaN(element.amount_recieved)) {
+          recievedAmountTotal += parseFloat(element.amount_recieved)
+        }
+      })
+
+      if (name === 'amount_recieved' && recievedAmountTotal > this.state.totalAllocatedFund) {
+        alert("Received amount cannot be more than allocated fund")
+        return
+      }
       this.setState({
         finance_recieved: finance_recieved,
+        totalActualRecievedFund: recievedAmountTotal
       });
-    }else {
+    } else if (type === "amountRecieved") {
       alert("Please select year")
       return
     }
@@ -388,6 +453,15 @@ class ProjectPlanEdit extends Component {
     if (this.state.finance_recieved.length > 1 && type === "amountRecieved") {
       const finance_recieved = this.state.finance_recieved;
       finance_recieved.splice(idx, 1);
+      let total = 0.00
+      finance_recieved.forEach(element => {
+        if (element.amount_recieved && !isNaN(element.amount_recieved)) {
+          total += parseFloat(element.amount_recieved)
+        }
+      })
+      this.setState({
+        totalActualRecievedFund: total
+      });
       this.setState({ finance_recieved: finance_recieved });
 
     }
@@ -407,8 +481,6 @@ class ProjectPlanEdit extends Component {
       });
     }
   }
-
-
 
   render() {
     var yearsSelectOption = this.state.years.map(function (year, index) {
@@ -454,7 +526,7 @@ class ProjectPlanEdit extends Component {
                               <label htmlFor="centreName">Centre Name </label>
 
                               <select
-                                class="form-control "
+                                className="form-control "
                                 name="centre_name"
                                 id="centre_name"
                                 value={this.state.singleFields.centre_name}
@@ -470,13 +542,13 @@ class ProjectPlanEdit extends Component {
                               <label htmlFor="projectName">Project Name</label>
 
                               <select
-                                class="form-control "
+                                className="form-control "
                                 name="project_name"
                                 id="project_name"
                                 value={this.state.singleFields.project_name}
                                 readOnly
                               >
-                                <option selected="selected"> select </option>
+                                <option value=''> select </option>
                                 {project}
                               </select>
                             </div>
@@ -490,13 +562,13 @@ class ProjectPlanEdit extends Component {
                               </label>
 
                               <select
-                                class="form-control "
+                                className="form-control "
                                 name="team_head"
                                 id="team_head"
                                 value={this.state.singleFields.project_head}
                                 readOnly
                               >
-                                <option selected="selected"> select </option>
+                                <option value=''> select </option>
                                 {team}
                               </select>
                             </div>
@@ -508,13 +580,13 @@ class ProjectPlanEdit extends Component {
                             </label>
 
                             <select
-                              class="form-control "
+                              className="form-control "
                               name="funding_ministry"
                               id="funding_ministry"
                               value={this.state.singleFields.funding_agency}
                               readOnly
                             >
-                              <option selected="selected"> select </option>
+                              <option value=''> select </option>
                               {agency}
                             </select>
                           </div>
@@ -617,7 +689,7 @@ class ProjectPlanEdit extends Component {
                               name="start_date"
                               id="start_date"
                               readOnly
-                              class="form-control"
+                              className="form-control"
                               value={moment(this.state.singleFields.start_date).format("DD-MM-YYYY")}
                             />
                           </div>
@@ -628,15 +700,15 @@ class ProjectPlanEdit extends Component {
                               name="end_date"
                               id="end_date"
                               readOnly
-                              class="form-control"
+                              className="form-control"
                               value={moment(this.state.singleFields.end_date).format("DD-MM-YYYY")}
                             />
                           </div>
                         </div>
 
                         <p className="lead"> Team Strength </p>
-                        <div class="hack1">
-                          <div class="hack2 scroll">
+                        <div className="hack1">
+                          <div className="hack2 scroll">
 
                             <table className="table">
                               <thead className="thead-dark">
@@ -705,11 +777,11 @@ class ProjectPlanEdit extends Component {
                                       <input
                                         type="text"
                                         className="form-control"
-                                        id="team"
+                                        id="remark"
                                         placeholder="Remark"
-                                        name="team"
+                                        name="remark"
                                         onChange={(evnt) => this.handleChangeMul(idx, evnt, "teamStrength")}
-                                        value={item.team}
+                                        value={item.remark}
                                       />
                                     </td>
                                   </tr>
@@ -723,11 +795,11 @@ class ProjectPlanEdit extends Component {
                         <p className="lead"> Finances </p>
                         {/* Choose Year & Quarter */}
                         <div className="row">
-                          <div className="col-md-4">
+                          <div className="col-md-6">
                             <div className="form-group">
                               <label htmlFor="centreName">Choose Year </label>
                               <select
-                                class="form-control "
+                                className="form-control "
                                 name="year"
                                 id="year"
                                 value={this.state.selectedYear}
@@ -738,11 +810,11 @@ class ProjectPlanEdit extends Component {
                               </select>
                             </div>
                           </div>
-                          <div className="col-md-4">
+                          <div className="col-md-6">
                             <div className="form-group">
-                              <label htmlFor="projectName">Choose activities</label>
+                              <label htmlFor="projectName">Choose Quarter</label>
                               <select
-                                class="form-control "
+                                className="form-control "
                                 name="project_name"
                                 id="project_name"
                                 value={this.state.selectedQuarter}
@@ -756,7 +828,7 @@ class ProjectPlanEdit extends Component {
                               </select>
                             </div>
                           </div>
-                          <div className="col-md-4">
+                          {/* <div className="col-md-4">
                             <div className="form-group">
                               <label htmlFor="projectName">Save Below Rows</label>
                               <button
@@ -764,23 +836,23 @@ class ProjectPlanEdit extends Component {
                                 type="button"
                                 onClick={() => this.saveRows()}
                               >
-                                Button
+                                Save
                               </button>
                             </div>
-                          </div>
+                          </div> */}
 
                         </div>
 
                         {/* Received Payment */}
                         <p>Received Amount</p>
                         <div className="card">
-                          <table class="table">
-                            <thead class="thead-light card-header">
+                          <table className="table">
+                            <thead className="thead-light card-header">
                               <th scope="col"> S.no </th>
                               <th scope="col"> Received Amount </th>
                               <th scope="col"> Date </th>
                               <th scope="col"> Remarks  </th>
-                              <th style={{ width: "100px" }}>Action  </th> 
+                              <th style={{ width: "100px" }}>Action  </th>
                             </thead>
                             <tbody className="card-body">
                               {this.state.finance_recieved.map((amt, idx) => (
@@ -792,7 +864,7 @@ class ProjectPlanEdit extends Component {
                                     id="amount_recieved"
                                     placeholder="Amount Recieved"
                                     name="amount_recieved"
-                                    onChange={(evnt) => this.handleChangeMul(idx, evnt, "amountRecieved")}
+                                    onChange={(evnt) => this.handleChangeMul2(idx, evnt, "amountRecieved")}
                                     value={amt.amount_recieved}
                                   /> </th>
                                   <th> <input
@@ -800,7 +872,7 @@ class ProjectPlanEdit extends Component {
                                     className="form-control"
                                     id="amount_recieved_date"
                                     name="amount_recieved_date"
-                                    onChange={(evnt) => this.handleChangeMul(idx, evnt, "amountRecieved")}
+                                    onChange={(evnt) => this.handleChangeMul2(idx, evnt, "amountRecieved")}
                                     value={amt.amount_recieved_date}
                                   /> </th>
                                   <th>
@@ -809,7 +881,7 @@ class ProjectPlanEdit extends Component {
                                       id="amount_remark"
                                       name="amount_remark"
                                       placeholder="Remarks..."
-                                      onChange={(evnt) =>  this.handleChangeMul(idx, evnt, "amountRecieved")}
+                                      onChange={(evnt) => this.handleChangeMul2(idx, evnt, "amountRecieved")}
                                       value={amt.amount_remark}
                                     ></textarea>
                                   </th>
@@ -819,15 +891,15 @@ class ProjectPlanEdit extends Component {
                                     name="project_plan_id"
                                     id="project_plan_id"
                                     readOnly
-                                    onChange={(evnt) => this.handleChangeMul(idx, evnt, "amountRecieved")}
+                                    onChange={(evnt) => this.handleChangeMul2(idx, evnt, "amountRecieved")}
                                     value={amt.project_plan_id}
                                   />
                                   <input
                                     type="hidden"
                                     className="form-control"
                                     name="year"
-                                   readOnly
-                                    onChange={(evnt) => this.handleChangeMul(idx, evnt, "amountRecieved")}
+                                    readOnly
+                                    onChange={(evnt) => this.handleChangeMul2(idx, evnt, "amountRecieved")}
                                     value={amt.year}
                                   />
                                   <td>
@@ -849,35 +921,33 @@ class ProjectPlanEdit extends Component {
                                 </tr>
                               ))}
                             </tbody>
-                            
-                          </table>
-                          <div class="card-footer row">
-                          {this.state.resStatusFinanceReceived.messages !== '' ?
-                            (<div className={ "p-2 form-control col-md-8 text-center "+(this.state.resStatusFinanceReceived.isError ? "alert-success" : "alert-danger")}> 
-                              {this.state.resStatusFinanceReceived.messages} 
-                            </div>)
-                            : ""}
-                              <button type="button" className="btn btn-primary col-md-2  ml-auto" onClick={this.saveAmount} > Save </button>
 
-                            </div>
+                          </table>
+                          {/* <div className="card-footer row">
+                            {this.state.resStatusFinanceReceived.messages !== '' ?
+                              (<div className={"p-2 form-control col-md-8 text-center " + (this.state.resStatusFinanceReceived.isError ? "alert-success" : "alert-danger")}>
+                                {this.state.resStatusFinanceReceived.messages}
+                              </div>)
+                              : ""}
+                            <button type="button" className="btn btn-primary col-md-2  ml-auto" onClick={this.saveAmount} > Save </button>
+
+                          </div> */}
                         </div>
                         {/* Calculation field  */}
                         <div className="card">
-                          <table class="table">
-                            <thead class="thead-light card-header">
+                          <table className="table">
+                            <thead className="thead-light card-header">
                               <th scope="col"> Allocated Budget </th>
                               <th scope="col"> Received Amount </th>
                               <th scope="col"> Expenditure </th>
                               <th scope="col"> Balance  </th>
-                              <th scope="col"> Utilization </th>
                             </thead>
                             <tbody className="card-body">
                               <tr>
-                                <th> 73684980 </th>
-                                <th> -- </th>
-                                <th> -- </th>
-                                <th> -- </th>
-                                <th> -- </th>
+                                <th> {this.state.totalAllocatedFund} </th>
+                                <th> {this.state.totalActualRecievedFund} </th>
+                                <th> {this.state.totalExpenditureFund} </th>
+                                <th> {this.state.totalActualRecievedFund - this.state.totalExpenditureFund} </th>
                               </tr>
 
                             </tbody>
@@ -885,8 +955,8 @@ class ProjectPlanEdit extends Component {
                         </div>
 
                         {/*  Expenditure Details */}
-                        <div class="hack1">
-                          <div class="hack2 scroll">
+                        <div className="hack1">
+                          <div className="hack2 scroll">
                             <table className="table">
                               <thead className="thead-dark">
                                 <tr>
@@ -894,11 +964,11 @@ class ProjectPlanEdit extends Component {
                                   <th>Budget Head</th>
                                   <th>Allocated Fund</th>
                                   <th>Milestone</th>
-                                  <th>Recieved Amount</th>
-                                  <th>Date</th>
+                                  {/* <th>Recieved Amount</th> */}
+                                  {/* <th>Date</th> */}
                                   <th>Expenditure</th>
-                                  <th>Balance</th>
-                                  <th>Utilization(%)</th>
+                                  {/* <th>Balance</th>
+                                  <th>Utilization(%)</th> */}
                                 </tr>
                               </thead>
                               <tbody id="tbl2">
@@ -960,29 +1030,6 @@ class ProjectPlanEdit extends Component {
                                       <input
                                         type="text"
                                         className="form-control"
-                                        id="received_amt"
-                                        placeholder="Received amt"
-                                        name="received_amt"
-                                        onChange={(evnt) => this.handleChangeMul(idx, evnt, "finances")}
-                                        value={item.received_amt}
-                                      />
-                                    </td>
-                                    <td>
-                                      <input
-                                        type="date"
-                                        className="form-control"
-                                        id="date"
-
-                                        placeholder="Date"
-                                        name="date"
-                                        onChange={(evnt) => this.handleChangeMul(idx, evnt, "finances")}
-                                        value={item.date}
-                                      />
-                                    </td>
-                                    <td>
-                                      <input
-                                        type="text"
-                                        className="form-control"
                                         id="expenditure"
 
                                         placeholder="Expenditure"
@@ -992,34 +1039,6 @@ class ProjectPlanEdit extends Component {
                                         style={{ width: "350px" }}
                                       />
                                     </td>
-                                    <td>
-                                      <input
-                                        type="text"
-                                        className="form-control"
-                                        id="balance"
-
-                                        placeholder="Balance"
-                                        name="balance"
-                                        onChange={(evnt) => this.handleChangeMul(idx, evnt, "finances")}
-                                        value={item.balance}
-                                        style={{ width: "150px" }}
-                                      />
-                                    </td>
-                                    <td>
-                                      <input
-                                        type="text"
-                                        className="form-control"
-                                        id="utilization"
-
-                                        placeholder="Utilization"
-                                        name="utilization"
-                                        onChange={(evnt) => this.handleChangeMul(idx, evnt, "finances")}
-                                        value={item.utilization}
-                                      />
-                                    </td>
-
-
-
                                   </tr>
                                 ))}
 
@@ -1030,79 +1049,52 @@ class ProjectPlanEdit extends Component {
 
 
                         <p className="lead"> Project Activities </p>
-                        <div class="hack1">
-                          <div class="hack2 scroll">
-
-                            <table className="table">
+                        <div className="">
+                          <div className="table-responsive">
+                             <table className="table border">
                               <thead className="thead-dark">
                                 <tr>
-                                  <th style={{ width: "230px" }}>Type</th>
-                                  <th style={{ width: "200px" }}>Start Date</th>
-                                  <th style={{ width: "200px" }}>End Date</th>
+                                  <th>Type</th>
+                                  <th>Start Date</th>
+                                  <th>End Date</th>
                                   <th> Duration <small>in days</small> </th>
-                                  <th style={{ width: "200px" }}>Status</th>
-                                  <th style={{ width: "200px" }}> Progress</th>
+                                  <th> Activities </th>
+                                  <th>Status</th>
+                                  <th> Progress</th>
                                 </tr>
                               </thead>
                               <tbody id="tbl3">
                                 {this.state.project_activities.map((item, idx) => (
                                   <tr key={"pa-" + idx}>
                                     <td>
-                                      <select
-                                        class="form-control select2 select2-hidden-accessible"
-                                        name="type"
-                                        id="type"
-                                        readOnly
-                                        onChange={(evnt) => this.handleChangeMul(idx, evnt, "project_activities")}
-                                        value={item.type}
-                                      >
-                                        <option selected="selected">select</option>
-                                        <option value="major">Major</option>
-                                        <option value="critical">Critical</option>
-                                        <option value="remaining">Remaining</option>
-                                      </select>
+                                    {item.type.charAt(0).toUpperCase() + item.type.slice(1)}
+                                    </td>
+                                    <td style={{width:"100px"}}>
+                                    {moment(item.start_date).format("DD-MM-YYYY")}
+                                    </td>
+                                    <td style={{width:"100px"}}>
+                                    {moment(item.end_date).format("DD-MM-YYYY")}
                                     </td>
                                     <td>
-                                      <input
-                                        type="text"
-                                        className="form-control"
-                                        id="start_date"
-                                        readOnly
-                                        name="start_date"
-                                        onChange={(evnt) => this.handleChangeMul(idx, evnt, "project_activities")}
-                                        value={moment(item.start_date).format("DD-MM-YYYY")}
-                                      />
+                                     
+                                      {item.duration}
                                     </td>
                                     <td>
-                                      <input
-                                        type="text"
-                                        className="form-control"
-                                        id="end_date"
-                                        readOnly
-                                        name="end_date"
-                                        onChange={(evnt) => this.handleChangeMul(idx, evnt, "project_activities")}
-                                        value={moment(item.end_date).format("DD-MM-YYYY")}
-                                      />
-                                    </td>
-                                    <td>
-                                      <input
-                                        type="text"
-                                        className="form-control"
-                                        name="duration"
-                                        readOnly
-                                        id="duration"
-                                        onChange={(evnt) => this.handleChangeMul(idx, evnt, "project_activities")}
-                                        value={item.duration}
-                                      />
+                                      
+                                      <div className="card p-2" style={{overflow: "auto",height:"100px"}}>
+                                      {item.activities}
+                                      </div>
                                     </td>
                                     <td>
                                       <textarea
                                         className="form-control "
                                         id="status"
                                         name="status"
-                                        placeholder="Status"
+                                        placeholder="Fill the status of activities completed separated by comma"
                                         onChange={(evnt) => this.handleChangeMul(idx, evnt, "project_activities")}
                                         value={item.status}
+                                        style={{width:"200px"}}
+
                                       ></textarea>
                                     </td>
                                     <td>
@@ -1110,9 +1102,11 @@ class ProjectPlanEdit extends Component {
                                         className="form-control "
                                         id="progress"
                                         name="progress"
-                                        placeholder="progress"
+                                        placeholder="Submit the overall progress of the activities"
                                         onChange={(evnt) => this.handleChangeMul(idx, evnt, "project_activities")}
                                         value={item.progress}
+                                        style={{width:"150px"}}
+                                        row={3}
                                       ></textarea>
                                     </td>
 
@@ -1125,8 +1119,8 @@ class ProjectPlanEdit extends Component {
                         </div>
 
                         <p className="lead"> Other Activities </p>
-                        <div class="hack1">
-                          <div class="hack2 scroll">
+                        <div className="hack1">
+                          <div className="hack2 scroll">
 
                             <table className="table">
                               <thead className="thead-dark">
