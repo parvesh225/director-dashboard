@@ -1,6 +1,7 @@
+
 .icon i{
   
-    color:#fbc658!important;
+    color:#fbc658;
 }
 .small-box .icon>i{
     font-size: 40px;
@@ -19,4 +20,21 @@
 .small-box>.small-box-footer {
     background-color: white;
     color: black;
+}
+
+.dashboardImg {
+    background-image: url('./../images/pexels-wallace-chuck-3728084.jpg');
+    height: 620px;
+    width: 100%;
+    background-repeat: no-repeat;
+    background-size: cover;
+    opacity: 0.9    ;
+
+}
+.card {
+    padding: 25px;
+}
+.customcolor:hover {
+    text-decoration: none;
+    background: #B54487 !important;
 }

@@ -15,6 +15,11 @@ FinanceRecieved.init({
       type: DataTypes.INTEGER,
       allowNull: false
       },  
+      
+    is_adjustment: {
+      type: DataTypes.BOOLEAN,
+      allowNull: true
+      },  
       year: {
       type: DataTypes.INTEGER,
       allowNull: false

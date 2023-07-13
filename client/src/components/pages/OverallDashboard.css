@@ -1,0 +1,21 @@
+
+
+.dashboardImg2 {
+    background-image: url('./../images/pexels-ono.jpg');
+    height: auto;
+    width: 100%;
+    background-repeat: no-repeat;
+    background-size: cover;
+    opacity: 0.9    ;
+
+}
+.card {
+    padding: 10px;
+}
+.text-custome-color {
+    color: #0d0d82!important;
+}
+.customcolor:hover {
+    text-decoration: none;
+    background: #B54487 !important;
+}

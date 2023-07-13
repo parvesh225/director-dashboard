@@ -15,6 +15,7 @@ Finances.init({
     type: DataTypes.INTEGER,
     allowNull: false
   },
+  
   year: {
     type: DataTypes.INTEGER,
     allowNull: false
@@ -25,7 +26,7 @@ Finances.init({
     allowNull: false
   },
   allocated_fund: {
-    type: DataTypes.FLOAT,
+    type: DataTypes.INTEGER,
     allowNull: false
   },
   milestone: {

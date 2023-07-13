@@ -32,7 +32,7 @@ ProjectPlan.init({
     allowNull: false
   },
   funding_agency: {
-    type: DataTypes.STRING,
+    type: DataTypes.INTEGER,
     allowNull: false
   },
   nodal_officer: {
@@ -54,11 +54,7 @@ ProjectPlan.init({
   end_date: {
     type: DataTypes.DATE,
     allowNull: false
-  },
-  overall_progress: {
-    type: DataTypes.STRING,
-    allowNull: false
-  },
+  }
 
 
 }, {

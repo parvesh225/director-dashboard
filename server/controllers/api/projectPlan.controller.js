@@ -10,6 +10,7 @@ const { Project } = require("../../models/Project");
 const { TeamLeader } = require("../../models/TeamLeader");
 const { FundingAgency } = require("../../models/FundingAgency");
 const { FinanceRecieved } = require("../../models/FinanceRecieved");
+const { db } = require("../../utils/db.utill");
 
 async function fetchMasterData(req, res, next) {
   try {
@@ -38,24 +39,33 @@ async function fetchMasterData(req, res, next) {
 }
 
 async function insert(req, res, next) {
-  
-  if(!req.body.team_strength) {
+
+  const { centre_name, project_name, team_head, funding_ministry, project_brief, work_order, nodal_officer, contact_no, allocated_budget, start_date, end_date } = req.body.FormData;
+
+  if (!centre_name || !project_name || !team_head || !funding_ministry || !work_order || !nodal_officer || !contact_no || !allocated_budget || !start_date || !end_date) {
+    return res.status(500).json({
+      "status": false,
+      "message": "All * fields are mandatory"
+    })
+  }
+
+  if (!req.body.team_strength) {
     return res.status(500).json({
       "status": false,
       "message": "Team Strength is required"
     })
   }
-  
-  if(req.body.team_strength) {
+
+  if (req.body.team_strength) {
     var isValid = true;
-    for (var i = 0; i < req.body.team_strength.length; i++) { 
+    for (var i = 0; i < req.body.team_strength.length; i++) {
       var obj = req.body.team_strength[i];
 
-      if(!obj.team || !obj.position || !obj.experience || !obj.qualification || !obj.salary_slab) {
+      if (!obj.team || !obj.position || !obj.experience || !obj.qualification || !obj.salary_slab) {
         isValid = false;
       }
     }
-    if( !isValid) {
+    if (!isValid) {
       return res.status(500).json({
         "status": false,
         "message": "Invalid data in team strength"
@@ -63,6 +73,54 @@ async function insert(req, res, next) {
     }
   }
 
+  // Validation for Finances
+  if (!req.body.finances) {
+    return res.status(500).json({
+      "status": false,
+      "message": "Finances is required"
+    })
+  }
+  if (req.body.finances) {
+    var isValid = true;
+    for (var i = 0; i < req.body.finances.length; i++) {
+      var obj = req.body.finances[i];
+
+      if (!obj.year || !obj.budget_head || !obj.allocated_fund) {
+        isValid = false;
+      }
+    }
+    if (!isValid) {
+      return res.status(500).json({
+        "status": false,
+        "message": "Invalid data in finances"
+      })
+    }
+  }
+
+  if (!req.body.project_activities) {
+    return res.status(500).json({
+      "status": false,
+      "message": "Project activities is required"
+    })
+  }
+
+  if (req.body.project_activities) {
+
+    for (var i = 0; i < req.body.project_activities.length; i++) {
+      var obj = req.body.project_activities[i];
+
+      if (!obj.type || !obj.start_date || !obj.end_date || !obj.activities) {
+        return res.status(500).json({
+          "status": false,
+          "message": "Invalid data in project activities"
+        })
+      }
+    }
+     
+  }
+
+//transaction begin
+const t = await db.transaction();
   try {
     let project = await ProjectPlan.create({
       centre_name: req.body.FormData.centre_name,
@@ -76,8 +134,9 @@ async function insert(req, res, next) {
       allocated_budget: req.body.FormData.allocated_budget,
       start_date: req.body.FormData.start_date,
       end_date: req.body.FormData.end_date,
-      overall_progress: req.body.FormData.overall_progress,
 
+    }, {
+      transaction:t
     });
     // Team Strength
 
@@ -90,23 +149,12 @@ async function insert(req, res, next) {
           "experience": req.body.team_strength[i].experience,
           "qualification": req.body.team_strength[i].qualification,
           "salary_slab": req.body.team_strength[i].salary_slab
+        }, {
+          transaction:t
         })
       }
     }
 
-    //Team
-    // if (req.body.team_strength) {
-    //   for (var i = 0; i < req.body.team_strength.length; i++) {
-    //     await Team.create({
-    //       "project_plan_id": project.id,
-    //       "team": req.body.team_strength[i].team, //number of team
-    //       "position": req.body.team_strength[i].position,
-    //       "experience": req.body.team_strength[i].experience,
-    //       "qualification": req.body.team_strength[i].qualification,
-    //       "salary_slab": req.body.team_strength[i].salary_slab
-    //     })
-    //   }
-    // }
     // Finances
     if (req.body.finances) {
       for (var i = 0; i < req.body.finances.length; i++) {
@@ -116,6 +164,8 @@ async function insert(req, res, next) {
           "budget_head": req.body.finances[i].budget_head,
           "allocated_fund": req.body.finances[i].allocated_fund,
           "milestone": req.body.finances[i].milestone,
+        }, {
+          transaction:t
         })
       }
     }
@@ -131,6 +181,8 @@ async function insert(req, res, next) {
           "duration": req.body.project_activities[i].duration,
           "activities": req.body.project_activities[i].activities,
           "remarks": req.body.project_activities[i].remarks
+        }, {
+          transaction:t
         })
       }
     }
@@ -139,20 +191,20 @@ async function insert(req, res, next) {
     if (req.body.other_activities) {
       for (var i = 0; i < req.body.other_activities.length; i++) {
         var eachAct = req.body.other_activities[i]
-        if(eachAct && eachAct.date && eachAct.activities){
+        if (eachAct && eachAct.date && eachAct.activities) {
           await OtherActivitie.create({
             "project_plan_id": project.id,
             "activities": req.body.other_activities[i].other_activity,
             "date": req.body.other_activities[i].other_date
+          }, {
+            transaction:t
           })
         }
       }
     }
 
-
-
-    //if successfully insert all data the commint transaction
-    // await t.commit(); 
+     //if successfully insert  data in all table
+    await t.commit(); 
 
     // Success Message Return
     return res.status(200).json({
@@ -160,10 +212,9 @@ async function insert(req, res, next) {
       "message": "Data inserted successfully!",
       "data": req.body
     });
-    // Error Message Return
+    
   } catch (error) {
-    // if not insert data successfully the rollback all table
-    // await t.rollback(); 
+    await t.rollback(); 
     return res.status(500).json({
       "status": false,
       "message": error.message,
@@ -175,10 +226,34 @@ async function insert(req, res, next) {
 }
 async function edit(req, res, next) {
 
+  if(!req.body.finance_recieved) {
+    return res.status(500).json({
+      "status": false,
+      "message": "Please select year & quarter"
+    })
+  }
+
+  if (req.body.finance_recieved) {
+    var isValid = true;
+    for(var j =0; j<req.body.finance_recieved.length; j++) {
+      var objV = req.body.finance_recieved[j];
+      if(!objV.amount_recieved || !objV.amount_recieved_date) {
+        isValid = false
+      }
+    }
+
+    if(isValid === false) {
+      return res.status(500).json({
+        "status": false,
+        "message": "Invalid data to save in received amount. Please select year & quarter"
+      })
+    }
+  }
+  
   try {
     const projectPlan = await ProjectPlan.findOne({
       where: {
-         id: req.body.FormData.id
+        id: req.body.FormData.id
       }
     })
     await projectPlan.update({ overall_progress: req.body.FormData.overall_progress });
@@ -187,6 +262,7 @@ async function edit(req, res, next) {
     // Team Strength
 
     if (req.body.team_strength) {
+
       //delete all team
       const ts = await Team.destroy({
         where: {
@@ -195,17 +271,17 @@ async function edit(req, res, next) {
       })
       for (var i = 0; i < req.body.team_strength.length; i++) {
         await Team.create({
-                "project_plan_id": projectPlan.id,
-                "team_strength_id": req.body.team_strength[i].team_strength_id,
-                "position": req.body.team_strength[i].position,
-                "experience": req.body.team_strength[i].experience,
-                "qualification": req.body.team_strength[i].qualification,
-                "salary_slab": req.body.team_strength[i].salary_slab,
-                "employee_name": req.body.team_strength[i].employee_name,
-                "employee_code": req.body.team_strength[i].employee_code,
-                "remark": req.body.team_strength[i].remark
-              })
-       
+          "project_plan_id": projectPlan.id,
+          "team_strength_id": req.body.team_strength[i].team_strength_id,
+          "position": req.body.team_strength[i].position,
+          "experience": req.body.team_strength[i].experience,
+          "qualification": req.body.team_strength[i].qualification,
+          "salary_slab": req.body.team_strength[i].salary_slab,
+          "employee_name": req.body.team_strength[i].employee_name,
+          "employee_code": req.body.team_strength[i].employee_code,
+          "remark": req.body.team_strength[i].remark
+        })
+
       }
     }
 
@@ -214,7 +290,7 @@ async function edit(req, res, next) {
       for (var i = 0; i < req.body.project_activities.length; i++) {
         const ts = await ProjectActivitie.findOne({
           where: {
-             id: req.body.project_activities[i].id
+            id: req.body.project_activities[i].id
           }
         })
         await ts.update({
@@ -228,23 +304,25 @@ async function edit(req, res, next) {
       for (var i = 0; i < req.body.finances.length; i++) {
         const ts = await Finances.findOne({
           where: {
-             id: req.body.finances[i].finance_id
+            id: req.body.finances[i].finance_id
           }
         })
-       
+
         await ts.update({
           "expenditure": req.body.finances[i].expenditure,
-          
+          "allocated_fund": req.body.finances[i].allocated_fund,
+
         })
       }
     }
-
+   
+ 
     //Other Activities
     if (req.body.other_activities) {
       for (var i = 0; i < req.body.other_activities.length; i++) {
         const ts = await OtherActivitie.findOne({
           where: {
-             id: req.body.other_activities[i].id
+            id: req.body.other_activities[i].id
           }
         })
         await ts.update({
@@ -254,10 +332,22 @@ async function edit(req, res, next) {
       }
     }
 
-    if(req.body.finance_recieved) {
-      
+    if (req.body.finance_recieved) {
+      var isValid = true;
+      for(var j =0; j<req.body.finance_recieved.length; j++) {
+        var objV = req.body.finance_recieved[j];
+        if(!objV.amount_recieved || !objV.amount_recieved_date) {
+          isValid = false
+        }
+      }
+
+      if(isValid === false) {
+        return res.status(500).json({
+          "status": false,
+          "message": "Invalid data to save in received amount"
+        })
+      }
       var year = req.body.finance_recieved[0].year;
-      
       const ts = await FinanceRecieved.destroy({
         where: {
           project_plan_id: projectPlan.id,
@@ -270,11 +360,13 @@ async function edit(req, res, next) {
           "year": req.body.finance_recieved[i].year,
           "amount_recieved": req.body.finance_recieved[i].amount_recieved,
           "amount_recieved_date": req.body.finance_recieved[i].amount_recieved_date,
-          "amount_remark": req.body.finance_recieved[i].amount_remark
+          "amount_remark": req.body.finance_recieved[i].amount_remark,
+          "is_adjustment": req.body.finance_recieved[i].is_adjustment
         })
       }
     }
     
+
 
     // Success Message Return
     return res.status(200).json({
@@ -322,7 +414,7 @@ async function fetchProjectPlan(req, res, next) {
     });
 
     let teamStrength = await TeamStrength.findAll({
-      where: {project_plan_id: `${project.id}`}
+      where: { project_plan_id: `${project.id}` }
     })
 
 
@@ -342,7 +434,7 @@ async function fetchProjectPlan(req, res, next) {
     const projects = await Project.findAll();
     const team_leader = await TeamLeader.findAll();
     const agencys = await FundingAgency.findAll();
-  //End Get Master data
+    //End Get Master data
 
     // Success Message Return
     return res.status(200).json({
@@ -356,7 +448,7 @@ async function fetchProjectPlan(req, res, next) {
       projects: projects,
       team_leader: team_leader,
       agencys: agencys,
-      teamStrength: teamStrength  
+      teamStrength: teamStrength
     });
 
   } catch (error) {
@@ -367,134 +459,114 @@ async function fetchProjectPlan(req, res, next) {
 
   }
 
-  
+
 
 }
 async function projectPlanList(req, res, next) {
-    try {
-      let dataList= await ProjectPlan.findAll();
-      const centres = await Centre.findAll();
-      const projects = await Project.findAll();
-      const team = await TeamLeader.findAll();
-      const agencys = await FundingAgency.findAll();
-      // Success Message Return
+  try {
+    let dataList = await ProjectPlan.findAll();
+    const centres = await Centre.findAll();
+    const projects = await Project.findAll();
+    const team = await TeamLeader.findAll();
+    const agencys = await FundingAgency.findAll();
+    // Success Message Return
     return res.status(200).json({
-          status: true,
-          data: dataList,
-          centres: centres,
-          projects: projects,
-          teams: team,
-          agencys: agencys
+      status: true,
+      data: dataList,
+      centres: centres,
+      projects: projects,
+      teams: team,
+      agencys: agencys
 
     });
-    } catch(error) {
-      return res.status(501).json({
-        status: false,
-        message: error.message
-      })
-    }
+  } catch (error) {
+    return res.status(501).json({
+      status: false,
+      message: error.message
+    })
+  }
 }
 
 async function fetchProjectPlanFinances(req, res, next) {
-  try{
-  let year = req.params.year;
-  let projectPlanId = req.params.projectPlanId;
+  try {
+    let year = req.params.year;
+    let projectPlanId = req.params.projectPlanId;
 
-let finances =await Finances.findAll({
-    where: {
+    let finances = await Finances.findAll({
+      where: {
         year: year,
         project_plan_id: projectPlanId
-    }
-})
-let finance_received =await FinanceRecieved.findAll({
-  where: {
-      year: year,
-      project_plan_id: projectPlanId
+      }
+    })
+    let finance_received = await FinanceRecieved.findAll({
+      where: {
+        year: year,
+        project_plan_id: projectPlanId
+      }
+    })
+    let total = 0.00
+    finances.forEach(element => {
+      total += element.allocated_fund
+    });
+
+    return res.status(200).json({
+      "status": true,
+      "finances": finances,
+      "finance_received": finance_received,
+      "total": total
+    });
+
+  } catch (error) {
+    return res.status(501).json({
+      status: false,
+      message: error.message
+    })
+
   }
-})
-let total = 0.00
-finances.forEach(element => {
-  total += element.allocated_fund
-});
-
-return res.status(200).json({
-  "status": true,
-  "finances": finances,
-  "finance_received" :finance_received,
-  "total": total
-});
-
-} catch (error) {
-  return res.status(501).json({
-    status: false,
-    message: error.message
-  })
-
-}
 
 
 }
 
 async function saveProjectPlanFinancesBudget(req, res, next) {
-    
-    try {
-      let project_plan_id = req.body.project_plan_id;
-      let year = req.body.year;
-      let quarter = req.body.quarter;
-      let received_amt = req.body.received_amt;
-      let date = req.body.date;
-      let expenditure = req.body.expenditure;
-      let balance = req.body.balance;
-      let utilization = req.body.utilization;
-      let finance_id = req.body.finance_id;
 
-     
-      if (!received_amt && !date && !expenditure && !balance && !utilization) {
-          throw new Error("Invalid data to save");
-      }
-
-      // Create Centre
-      let finance_budget = await FinanceBudget.create(req.body);
+  try {
+    let project_plan_id = req.body.project_plan_id;
+    let year = req.body.year;
+    let quarter = req.body.quarter;
+    let received_amt = req.body.received_amt;
+    let date = req.body.date;
+    let expenditure = req.body.expenditure;
+    let balance = req.body.balance;
+    let utilization = req.body.utilization;
+    let finance_id = req.body.finance_id;
 
 
-      // Send Success Response
-      return res.status(200).json({
-          status: true,
-          message: "Successfully Saved",
-      });
+    if (!received_amt && !date && !expenditure && !balance && !utilization) {
+      throw new Error("Invalid data to save");
+    }
+
+    // Create Centre
+    let finance_budget = await FinanceBudget.create(req.body);
+
+
+    // Send Success Response
+    return res.status(200).json({
+      status: true,
+      message: "Successfully Saved",
+    });
 
   } catch (error) {
-      // Send error response
-      return res.status(500).json({
-          status: false,
-          message: `Fail centre:- ${error}`,
-    
-      })
+    // Send error response
+    return res.status(500).json({
+      status: false,
+      message: `Fail centre:- ${error}`,
+
+    })
   }
 
-    
+
 }
 
-// async function financeRecieved (req, res, next) {
-//   try{
-    
-//     return res.status(200).json({
-//       status:true,
-//       message:" Finance data saved successfully!"
-//     })
-//   }catch(err) {
-//     return res.status(500).json({
-//       status:false,
-//       message: " * All fields are mandatory please fill"
-//     })
-//   }
-
-  
-//   return res.status(200).json({
-//     status:true,
-//     data: req.body
-//   })
-// }
 
 module.exports = {
   insert,

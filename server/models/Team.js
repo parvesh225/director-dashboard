@@ -34,7 +34,9 @@ Team.init({
   },
   employee_code: {
     type: DataTypes.STRING,
-    allowNull: true
+    allowNull: true,
+    // unique: true,
+
   },
   employee_name: {
     type: DataTypes.STRING,

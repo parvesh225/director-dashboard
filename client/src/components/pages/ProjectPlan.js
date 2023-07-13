@@ -3,6 +3,7 @@ import Footer from "../layout/Footer";
 import Header from "../layout/Header";
 import Sidebar from "../layout/Sidebar";
 import './ProjectPlan2.css';
+import moment from 'moment';
 const axios = require("axios").default;
 
 class ProjectPlan extends Component {
@@ -29,7 +30,6 @@ class ProjectPlan extends Component {
         allocated_budget: "",
         start_date: "",
         end_date: "",
-        overall_progress: "",
       },
       team_strength: [
         {
@@ -73,8 +73,32 @@ class ProjectPlan extends Component {
     this.submitForm = this.submitForm.bind(this);
     this.diffDays = this.diffDays.bind(this);
     this.blankForm = this.blankForm.bind(this);
+    this.validateYear = this.validateYear.bind(this);
   }
 
+  validateYear(idx, e) {
+    const { name, value } = e.target;
+    var dateArr =  this.state.singleFields.start_date.split("-");
+    var startYear = dateArr[0];
+
+    var dateEndArr =  this.state.singleFields.end_date.split("-");
+    var endYear = dateEndArr[0];
+
+    var years = Array();
+    for (var i = startYear; i <= endYear; i++) years.push(parseInt(i));
+    // console.log(JSON.stringify(years));
+    
+      if(!years.includes(parseInt(value))) {
+        alert("Please enter the year between the project duration");
+        const finances = this.state.finances;
+        finances[idx][name] = "";
+        this.setState({
+          finances: finances,
+        });
+        return false
+      }
+
+ }
   blankForm(){
     var singleFields = {
       centre_name: "",
@@ -187,7 +211,7 @@ class ProjectPlan extends Component {
       }
 
     }).catch(function (error) {
-      console.log(error.response.data)
+      console.log(error.response)
       var data = error.response.data;
       if (error.response.data.status === false) {
         var resStatus = thizz.state.resStatus;
@@ -208,7 +232,7 @@ class ProjectPlan extends Component {
 
   // SET MULTIPLE ROW
   handleChangeMul(idx, e, type) {
-    console.log(idx, e.target.name, type);
+    
     if (type === "teamStrength") {
       const { name, value } = e.target;
       const team_strength = this.state.team_strength;
@@ -361,7 +385,7 @@ class ProjectPlan extends Component {
                         <div className="row">
                           <div className="col-md-6">
                             <div className="form-group">
-                              <label htmlFor="centreName">Centre Name </label>
+                              <label htmlFor="centreName"> <span className="text-danger">*</span>Centre Name </label>
                               {/* {JSON.stringify(this.state.singleFields.centre_name)}ssss */}
 
                               <select
@@ -378,7 +402,7 @@ class ProjectPlan extends Component {
                           </div>
                           <div className="col-md-6">
                             <div className="form-group">
-                              <label htmlFor="projectName">Project Name </label>
+                              <label htmlFor="projectName"> <span className="text-danger">*</span> Project Name </label>
                               <select
                                 className="form-control "
                                 name="project_name"
@@ -396,6 +420,7 @@ class ProjectPlan extends Component {
                           <div className="col-md-6">
                             <div className="form-group">
                               <label htmlFor="projectHeadName">
+                              <span className="text-danger">*</span>
                                 Project Head Name
                               </label>
                               <select
@@ -426,6 +451,7 @@ class ProjectPlan extends Component {
                           </div> */}
                           <div className="form-group col-md-6">
                             <label for="fundingMinistry/Agency/Dept">
+                            <span className="text-danger">*</span>
                               Funding Ministry/Agency/Dept.
                             </label>
                             <select
@@ -457,6 +483,7 @@ class ProjectPlan extends Component {
 
                           <div className="form-group col-md-6">
                             <label htmlFor="workOrderNo" className="p">
+                            <span className="text-danger">*</span>
                               Work Order No
                             </label>
                             <input
@@ -476,6 +503,7 @@ class ProjectPlan extends Component {
 
                           <div className="form-group col-md-6">
                             <label htmlFor="nodalOfficerName" className="p">
+                            <span className="text-danger">*</span>
                               Nodal Officer Name
                             </label>
                             <input
@@ -489,9 +517,12 @@ class ProjectPlan extends Component {
                             />
                           </div>
                           <div className="form-group col-md-6">
-                            <label htmlFor="contactNo">Contact no.</label>
+                            <label htmlFor="contactNo">
+                            <span className="text-danger">*</span>
+                              Contact no.
+                              </label>
                             <input
-                              type="text"
+                              type="number"
                               className="form-control"
                               id="contact_no"
                               name="contact_no"
@@ -502,11 +533,12 @@ class ProjectPlan extends Component {
                         </div>
                         <div className="row ">
                           <div className="form-group col-md-6">
-                            <label for="allocated_budget">
+                            <label htmlFor="allocated_budget">
+                            <span className="text-danger">*</span>
                               Allocated Budget
                             </label>
                             <input
-                              type="text"
+                              type="number"
                               className="form-control"
                               id="allocated_budget"
                               name="allocated_budget"
@@ -515,21 +547,8 @@ class ProjectPlan extends Component {
                               onChange={this.handleChange}
                             />
                           </div>
-                          {/* <div className="form-group col-md-6">
-                            <label for="overall_progress">
-                              Overall Progress
-                            </label>
-                            <input
-                              className="form-control"
-                              id="overall_progress"
-                              name="overall_progress"
-                              placeholder="Overall Progress"
-                              value={this.state.singleFields.overall_progress}
-                              onChange={this.handleChange}
-                            />
-                          </div> */}
                           <div className="form-group col-md-6">
-                            <label for="startDate">Start Date</label>
+                            <label htmlFor="startDate"> <span className="text-danger">*</span>Start Date</label>
                             <input
                               type="date"
                               name="start_date"
@@ -543,7 +562,9 @@ class ProjectPlan extends Component {
                         <div className="row">
 
                           <div className="form-group col-md-6">
-                            <label htmlFor="endDate">End Date</label>
+                            <label htmlFor="endDate">
+                            <span className="text-danger">*</span>
+                              End Date</label>
                             <input
                               type="date"
                               name="end_date"
@@ -574,7 +595,7 @@ class ProjectPlan extends Component {
                                 <td>{idx + 1}</td>
                                 <td>
                                 <input
-                                    type="text"
+                                    type="number"
                                     className="form-control"
                                     id="Team Strength"
                                     placeholder="Team Strength"
@@ -665,13 +686,14 @@ class ProjectPlan extends Component {
                               <tr key={"fin-" + idx}>
                                 <td>
                                   <input
-                                    type="text"
+                                    type="number"
                                     className="form-control"
                                     id="year"
                                     placeholder="Year"
                                     name="year"
                                     onChange={(evnt) => this.handleChangeMul(idx, evnt, "finances")}
                                     value={item.year}
+                                    onBlur ={(evnt) => this.validateYear(idx, evnt)}
                                   />
                                 </td>
                                 <td>
@@ -688,7 +710,7 @@ class ProjectPlan extends Component {
                                 </td>
                                 <td>
                                   <input
-                                    type="text"
+                                    type="number"
                                     className="form-control"
                                     id="allocated_fund"
                                     placeholder="Allocated Fund"

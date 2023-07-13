@@ -73,6 +73,14 @@ class ProjectPlanEdit extends Component {
           year: ""
         },
       ],
+      external_agency: [
+        {
+          agency_name: "",
+          agency_specification: "",
+          type: "",
+          amount: "",
+        },
+      ],
       totalAllocatedFund: 0.00,
       totalActualRecievedFund: 0.00,
       totalExpenditureFund: 0.00
@@ -88,84 +96,14 @@ class ProjectPlanEdit extends Component {
     // this.saveAmount = this.saveAmount.bind(this);
   }
 
-  // saveAmount() {
-  //   var thizz = this;
-  //   if (!this.state.selectedYear) {
-  //     alert("Please select year to save")
-  //     return
-  //   }
-  //   var myObj = {
-  //     finance_recieved: thizz.state.finance_recieved,
-  //   }
-  //   axios({
-  //     method: "post",
-  //     url: process.env.REACT_APP_BASE_URL + "/api/admin/finance-recieved",
-  //     data: myObj
-  //   }).then((response) => {
-  //     var data = response.data
-  //     if (data.status === true) {
-  //       var resStatusFinanceReceived = thizz.state.resStatusFinanceReceived;
-  //       resStatusFinanceReceived.isError = true;
-  //       resStatusFinanceReceived.messages = data.message;
-  //       thizz.setState({ resStatusFinanceReceived: resStatusFinanceReceived });
-  //     }
 
-  //   }).catch((error) => {
-  //     var data = error.response.data;
-  //     if (error.response.data.status === false) {
-  //       var resStatusFinanceReceived = thizz.state.resStatusFinanceReceived;
-  //       resStatusFinanceReceived.messages = data.message;
-  //       thizz.setState({ resStatusFinanceReceived: resStatusFinanceReceived });
-  //     }
-  //   })
-  // }
 
   // For simple fields
   handleChangeQuarter(e) {
     this.setState({ selectedQuarter: e.target.value });
   }
 
-  // saveRows() {
-  //   if (!this.state.selectedQuarter || !this.state.selectedYear) {
-  //     alert("Please select year and quarter to save")
-  //     return
-  //   }
-  //   var thizz = this
-  //   for (let i = 0; i < this.state.finances.length; i++) {
-  //     axios({
-  //       method: "post",
-  //       url: process.env.REACT_APP_BASE_URL + "/api/admin/fetch-finances-by-year-project",
-  //       data: thizz.state.finances[i]
-  //     }).then((response) => {
-  //       console.log(response.data)
-  //       var resp = response.data
-  //       var msg = ""
-  //       if (resp.status === 'true' || resp.status === true) {
-  //         msg = "Successfully Save"
-  //       } else {
-  //         msg = resp.message
-  //       }
-  //       const finances = this.state.finances;
-  //       finances[i]['errorMsg'] = msg;
-  //       console.log(finances)
-  //       this.setState({
-  //         finances: finances,
-  //       });
-  //     }).catch((error) => {
-  //       console.log(error.response.data);
-  //       var resp = error.response.data
-  //       var msg = ""
-  //       msg = resp.message
 
-  //       const finances = this.state.finances;
-  //       finances[i]['errorMsg'] = msg;
-  //       console.log(finances)
-  //       this.setState({
-  //         finances: finances,
-  //       });
-  //     })
-  //   }
-  // }
 
   handleChangeMul(idx, e, type) {
     console.log(idx, e.target.name, type);
@@ -186,10 +124,11 @@ class ProjectPlanEdit extends Component {
           total += parseFloat(element.expenditure)
         }
       })
-      if (name === 'expenditure' && total > this.state.totalActualRecievedFund) {
-        alert("Expenditure cannot be more than recieved amounts")
-        return
-      }
+      // if (name === 'expenditure' && total > this.state.totalActualRecievedFund) {
+      //   alert("Expenditure cannot be more than recieved amounts")
+      //   return
+      // }
+
       this.setState({
         finances: finances,
         totalExpenditureFund: total
@@ -207,6 +146,13 @@ class ProjectPlanEdit extends Component {
       other_activities[idx][name] = value;
       this.setState({
         other_activities: other_activities,
+      });
+    } else if (type === "externalAgency") {
+      const { name, value } = e.target;
+      const external_agency = this.state.external_agency;
+      external_agency[idx][name] = value;
+      this.setState({
+        external_agency: external_agency,
       });
     }
   }
@@ -233,7 +179,7 @@ class ProjectPlanEdit extends Component {
     axios.get(process.env.REACT_APP_BASE_URL + "/api" +
       "/admin/fetch-finances-by-year-project/" + e.target.value + "/" + this.state.singleFields.id)
       .then((response) => {
-        console.log(response.data.finances)
+        // console.log(response.data.finances)
         var financeesList = [];
         for (let i = 0; i < response.data.finances.length; i++) {
           var item = response.data.finances[i]
@@ -266,7 +212,7 @@ class ProjectPlanEdit extends Component {
           totalAllocatedFund: response.data.total,
           totalExpenditureFund: total,
           totalActualRecievedFund: total2,
-          finance_recieved : response.data.finance_received.length > 0 ? response.data.finance_received : finance_recieved
+          finance_recieved: response.data.finance_received.length > 0 ? response.data.finance_received : finance_recieved
         })
 
       }).catch((error) => {
@@ -332,48 +278,48 @@ class ProjectPlanEdit extends Component {
 
         })
 
-   
+
         var financeesList = [];
         for (let i = 0; i < response.data.teamStrength.length; i++) {
           var eachItem = response.data.teamStrength[i]
           var teamLength = eachItem.team
-          var teamByTeamStrength= response.data.teams.filter(
-            function(x){return x.team_strength_id===eachItem.id}
-            )
-            var totalLength  = teamByTeamStrength.length
-            for(let j=0; j< totalLength; j++) {
-              var item = teamByTeamStrength[j]
+          var teamByTeamStrength = response.data.teams.filter(
+            function (x) { return x.team_strength_id === eachItem.id }
+          )
+          var totalLength = teamByTeamStrength.length
+          for (let j = 0; j < totalLength; j++) {
+            var item = teamByTeamStrength[j]
+            financeesList.push({
+              id: item.id,
+              project_plan_id: item.project_plan_id,
+              remark: item.remark,
+              team_strength_id: eachItem.id,
+              position: item.position,
+              experience: item.experience,
+              qualification: item.qualification,
+              salary_slab: item.salary_slab,
+              employee_code: item.employee_code,
+              employee_name: item.employee_name,
+            })
+          }
+
+          var pendingTeamCount = teamLength - totalLength;
+          if (pendingTeamCount > 0) {
+            for (let j = 0; j < pendingTeamCount; j++) {
+
               financeesList.push({
-                id: item.id,
-                project_plan_id: item.project_plan_id,
-                remark: item.remark,
                 team_strength_id: eachItem.id,
-                position: item.position,
-                experience: item.experience,
-                qualification: item.qualification,
-                salary_slab: item.salary_slab,
-                employee_code: item.employee_code,
-                employee_name: item.employee_name,
+                project_plan_id: eachItem.project_plan_id,
+                remark: "",
+                position: eachItem.position,
+                experience: eachItem.experience,
+                qualification: eachItem.qualification,
+                salary_slab: eachItem.salary_slab,
+                employee_code: '',
+                employee_name: '',
               })
             }
-
-            var pendingTeamCount = teamLength - totalLength;
-            if(pendingTeamCount > 0) {
-              for(let j=0; j< pendingTeamCount; j++) {
-               
-                financeesList.push({
-                  team_strength_id: eachItem.id,
-                  project_plan_id: eachItem.project_plan_id,
-                  remark: "",
-                  position: eachItem.position,
-                  experience: eachItem.experience,
-                  qualification: eachItem.qualification,
-                  salary_slab: eachItem.salary_slab,
-                  employee_code: '',
-                  employee_name: '',
-                })
-              }
-            }
+          }
         }
         //var totalTeamStren
         this.setState({ team_strength: financeesList })
@@ -422,10 +368,18 @@ class ProjectPlanEdit extends Component {
   // SET MULTIPLE ROW
   handleChangeMul2(idx, e, type) {
 
-    if (type === "amountRecieved" && this.state.selectedYear) {
+    if (type === "amountRecieved" && this.state.selectedYear && this.state.selectedQuarter) {
       const { name, value } = e.target;
       const finance_recieved = this.state.finance_recieved;
+      if('checked' in e.target) {
+        console.log(e.target.checked)
+        finance_recieved[idx][name] = e.target.checked === true ? true : false ;
+    }else{
       finance_recieved[idx][name] = value;
+
+    }
+    
+    
       finance_recieved[idx]['project_plan_id'] = this.props.params.id
       finance_recieved[idx]['year'] = this.state.selectedYear
       let recievedAmountTotal = 0.00
@@ -444,7 +398,7 @@ class ProjectPlanEdit extends Component {
         totalActualRecievedFund: recievedAmountTotal
       });
     } else if (type === "amountRecieved") {
-      alert("Please select year")
+      alert("Please select year & quarter")
       return
     }
   }
@@ -465,6 +419,14 @@ class ProjectPlanEdit extends Component {
       this.setState({ finance_recieved: finance_recieved });
 
     }
+    if (this.state.external_agency.length > 1 && type === "externalAgency") {
+      const external_agency = this.state.external_agency;
+      external_agency.splice(idx, 1);
+
+
+      this.setState({ external_agency: external_agency });
+
+    }
   }
 
   handleAddRow(type) {
@@ -478,6 +440,17 @@ class ProjectPlanEdit extends Component {
       };
       this.setState({
         finance_recieved: [...this.state.finance_recieved, item],
+      });
+    }
+    if (type === "externalAgency") {
+      const item = {
+        agency_name: "",
+        agency_specification: "",
+        type: "",
+        amount: "",
+      };
+      this.setState({
+        external_agency: [...this.state.external_agency, item],
       });
     }
   }
@@ -828,18 +801,7 @@ class ProjectPlanEdit extends Component {
                               </select>
                             </div>
                           </div>
-                          {/* <div className="col-md-4">
-                            <div className="form-group">
-                              <label htmlFor="projectName">Save Below Rows</label>
-                              <button
-                                className="form-control btn btn-primary"
-                                type="button"
-                                onClick={() => this.saveRows()}
-                              >
-                                Save
-                              </button>
-                            </div>
-                          </div> */}
+
 
                         </div>
 
@@ -848,7 +810,7 @@ class ProjectPlanEdit extends Component {
                         <div className="card">
                           <table className="table">
                             <thead className="thead-light card-header">
-                              <th scope="col"> S.no </th>
+                              <th scope="col"> Adjustment? </th>
                               <th scope="col"> Received Amount </th>
                               <th scope="col"> Date </th>
                               <th scope="col"> Remarks  </th>
@@ -857,9 +819,23 @@ class ProjectPlanEdit extends Component {
                             <tbody className="card-body">
                               {this.state.finance_recieved.map((amt, idx) => (
                                 <tr key={"ra-" + idx}>
-                                  <td> {idx + 1} </td>
+                                  <td>
+                                    <div class="form-check">
+                                      <label class="form-check-label">
+                                        <input
+                                          type="checkbox"
+                                          className="form-check-input"
+                                          id="is_adjustment"
+                                          name="is_adjustment"
+                                          onChange={(evnt) => this.handleChangeMul2(idx, evnt, "amountRecieved")}
+                                          checked={amt.is_adjustment}
+                                          value={amt.is_adjustment}
+                                        />
+                                      </label>
+                                    </div>
+                                  </td>
                                   <th> <input
-                                    type="text"
+                                    type="number"
                                     className="form-control"
                                     id="amount_recieved"
                                     placeholder="Amount Recieved"
@@ -873,7 +849,7 @@ class ProjectPlanEdit extends Component {
                                     id="amount_recieved_date"
                                     name="amount_recieved_date"
                                     onChange={(evnt) => this.handleChangeMul2(idx, evnt, "amountRecieved")}
-                                    value={amt.amount_recieved_date}
+                                    value={moment(amt.amount_recieved_date).format('YYYY-MM-DD')}
                                   /> </th>
                                   <th>
                                     <textarea
@@ -1006,7 +982,7 @@ class ProjectPlanEdit extends Component {
                                         type="text"
                                         className="form-control"
                                         id="allocated_fund"
-                                        readOnly
+                                        
                                         placeholder="Allocated Fund"
                                         name="allocated_fund"
                                         onChange={(evnt) => this.handleChangeMul(idx, evnt, "finances")}
@@ -1051,7 +1027,7 @@ class ProjectPlanEdit extends Component {
                         <p className="lead"> Project Activities </p>
                         <div className="">
                           <div className="table-responsive">
-                             <table className="table border">
+                            <table className="table border">
                               <thead className="thead-dark">
                                 <tr>
                                   <th>Type</th>
@@ -1067,22 +1043,22 @@ class ProjectPlanEdit extends Component {
                                 {this.state.project_activities.map((item, idx) => (
                                   <tr key={"pa-" + idx}>
                                     <td>
-                                    {item.type.charAt(0).toUpperCase() + item.type.slice(1)}
+                                      {item.type.charAt(0).toUpperCase() + item.type.slice(1)}
                                     </td>
-                                    <td style={{width:"100px"}}>
-                                    {moment(item.start_date).format("DD-MM-YYYY")}
+                                    <td style={{ width: "100px" }}>
+                                      {moment(item.start_date).format("DD-MM-YYYY")}
                                     </td>
-                                    <td style={{width:"100px"}}>
-                                    {moment(item.end_date).format("DD-MM-YYYY")}
+                                    <td style={{ width: "100px" }}>
+                                      {moment(item.end_date).format("DD-MM-YYYY")}
                                     </td>
                                     <td>
-                                     
+
                                       {item.duration}
                                     </td>
                                     <td>
-                                      
-                                      <div className="card p-2" style={{overflow: "auto",height:"100px"}}>
-                                      {item.activities}
+
+                                      <div className="card p-2" style={{ overflow: "auto", height: "100px" }}>
+                                        {item.activities}
                                       </div>
                                     </td>
                                     <td>
@@ -1093,7 +1069,7 @@ class ProjectPlanEdit extends Component {
                                         placeholder="Fill the status of activities completed separated by comma"
                                         onChange={(evnt) => this.handleChangeMul(idx, evnt, "project_activities")}
                                         value={item.status}
-                                        style={{width:"200px"}}
+                                        style={{ width: "200px" }}
 
                                       ></textarea>
                                     </td>
@@ -1105,7 +1081,7 @@ class ProjectPlanEdit extends Component {
                                         placeholder="Submit the overall progress of the activities"
                                         onChange={(evnt) => this.handleChangeMul(idx, evnt, "project_activities")}
                                         value={item.progress}
-                                        style={{width:"150px"}}
+                                        style={{ width: "150px" }}
                                         row={3}
                                       ></textarea>
                                     </td>
@@ -1117,6 +1093,75 @@ class ProjectPlanEdit extends Component {
 
                           </div>
                         </div>
+                        <p className="lead">External Agency</p>
+
+                        <table className="table">
+                          <thead className="thead-light card-header">
+                            <th scope="col"> S.no </th>
+                            <th scope="col"> Agency Name </th>
+                            <th scope="col"> Agency Specification </th>
+                            <th scope="col"> Type  </th>
+                            <th scope="col"> Amount  </th>
+                            <th style={{ width: "100px" }}>Action  </th>
+                          </thead>
+                          <tbody className="card-body">
+                            {this.state.external_agency.map((ext, idx) => (
+                              <tr key={"ea-" + idx}>
+                                <td> {idx + 1} </td>
+                                <td> <input
+                                  type="text"
+                                  className="form-control"
+                                  id="agency_name"
+                                  placeholder="Amount Recieved"
+                                  name="agency_name"
+                                  onChange={(evnt) => this.handleChangeMul(idx, evnt, "externalAgency")}
+                                  value={ext.agency_name}
+                                /> </td>
+                                <td>
+                                  <textarea className="form-control " name="agency_specification" id="agency_specification" cols="30" onChange={(evnt) => this.handleChangeMul(idx, evnt, "externalAgency")}
+                                    value={ext.agency_specification}></textarea>
+                                </td>
+                                <td> <input
+                                  type="text"
+                                  className="form-control"
+                                  id="type"
+
+                                  name="type"
+                                  onChange={(evnt) => this.handleChangeMul(idx, evnt, "externalAgency")}
+                                  value={ext.type}
+                                /> </td>
+                                <td> <input
+                                  type="text"
+                                  className="form-control"
+                                  id="amt"
+                                  placeholder="Amount Recieved"
+                                  name="amt"
+                                  onChange={(evnt) => this.handleChangeMul(idx, evnt, "externalAgency")}
+                                  value={ext.amt}
+                                /> </td>
+
+                                <td>
+                                  <button
+                                    className="btn btn-danger btn-sm m-1"
+                                    type="button"
+                                    onClick={() => this.handleAddRow("externalAgency")}
+                                  >
+                                    +
+                                  </button>
+                                  <button
+                                    type="button"
+                                    className="btn btn-success btn-sm"
+                                    onClick={() => this.handleRemoveSpecificRow(idx, "externalAgency")}
+                                  >
+                                    -
+                                  </button>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+
+                        </table>
+
 
                         <p className="lead"> Other Activities </p>
                         <div className="hack1">

@@ -5,6 +5,7 @@ const fundingController = require('../controllers/api/funding.controller');
 const projectController = require('../controllers/api/project.controller');
 const teamleaderController = require('../controllers/api/teamleader.controller');
 const projectPlanController = require('../controllers/api/projectPlan.controller');
+const overallDashboardController = require('../controllers/api/viewProjectPlan.controller');
 
 // Centre Route
 router.post('/admin/centre', centreController.insert);
@@ -51,4 +52,9 @@ router.get('/admin/project-plan/:id',projectPlanController.fetchProjectPlan);
 router.get('/admin/fetch-finances-by-year-project/:year/:projectPlanId',projectPlanController.fetchProjectPlanFinances);
 router.post('/admin/fetch-finances-by-year-project',projectPlanController.saveProjectPlanFinancesBudget);
 //End Project Plan
+
+
+//Frontend
+router.get('/admin/overall-dashboard/:id',overallDashboardController.overallDashboard);
+router.get('/admin/project-finance-details/:id',overallDashboardController.fundingDetail);
 module.exports = router;
