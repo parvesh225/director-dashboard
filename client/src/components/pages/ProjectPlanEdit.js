@@ -35,6 +35,8 @@ class ProjectPlanEdit extends Component {
       },
       years: [],
       selectedYear: "",
+      selectedYearProjectActivity: "",
+
       selectedQuarter: "",
       team_strength: [
         {
@@ -48,8 +50,29 @@ class ProjectPlanEdit extends Component {
         },
       ],
       finances: [],
-      project_activities: [],
 
+      project_activity: [],
+      default_activity: {
+        id: "",
+        project_master_activity_id: "",
+        project_master_activity_name: "",
+        project_master_sub_activity_id: "",
+        project_master_sub_activity_name: "",
+        project_master_sub_activity: [],
+        start_date: "",
+        end_date: "",
+        expected_entries: 1,
+        current_entries: 1,
+        year: "",
+        quarter: "",
+        tasks: [{
+          id: "",
+          task: "",
+
+        }]
+      },
+
+      project_master_activity: [],
       other_activities: [
         {
           other_activity: "",
@@ -81,11 +104,13 @@ class ProjectPlanEdit extends Component {
           amount: "",
         },
       ],
+
       totalAllocatedFund: 0.00,
       totalActualRecievedFund: 0.00,
       totalExpenditureFund: 0.00
     }
     this.onChangeYear = this.onChangeYear.bind(this);
+    this.onChangeYearProjectActivity = this.onChangeYearProjectActivity.bind(this);
     this.handleChangeQuarter = this.handleChangeQuarter.bind(this);
     // this.saveRows = this.saveRows.bind(this)
     this.handleChange = this.handleChange.bind(this)
@@ -93,9 +118,16 @@ class ProjectPlanEdit extends Component {
     this.handleChangeMul = this.handleChangeMul.bind(this);
     this.handleAddRow = this.handleAddRow.bind(this);
     this.handleRemoveSpecificRow = this.handleRemoveSpecificRow.bind(this);
-    // this.saveAmount = this.saveAmount.bind(this);
+    this.handleSubActivity = this.handleSubActivity.bind(this);
+    this.handleChangeMulTask = this.handleChangeMulTask.bind(this);
+    this.handleAddRowTask = this.handleAddRowTask.bind(this);
+    this.handleRemoveSpecificRowOfTask = this.handleRemoveSpecificRowOfTask.bind(this);
+    this.submitActivity = this.submitActivity.bind(this);
   }
 
+  
+  
+  
 
 
   // For simple fields
@@ -103,6 +135,38 @@ class ProjectPlanEdit extends Component {
     this.setState({ selectedQuarter: e.target.value });
   }
 
+  submitActivity () {
+    var thizz = this;
+    
+    //Send request to backend
+    axios({
+      method: "post",
+      url: process.env.REACT_APP_BASE_URL + "/api/admin/save-finances-by-year-project/"+thizz.state.selectedYearProjectActivity+"/"+thizz.props.params.id,
+      data: thizz.state.project_activity
+    }).then(function (response) {
+      var data = response.data
+      if (data.status === true && data) {
+       alert(data.message)
+      }
+
+    }).catch(function (error) {
+      console.log(error.response.data)
+      var data = error.response.data;
+      if (error.response.data.status === false) {
+        alert('Error:' +  data.message)
+      }
+    })
+  }
+
+
+  handleChangeMulTask (pidx, cidx, e, type) {
+      const { name, value } = e.target;
+      const project_activity = this.state.project_activity;
+      project_activity[pidx]['tasks'][cidx][name] = value;
+      this.setState({
+        project_activity: project_activity,
+      });
+  }
 
 
   handleChangeMul(idx, e, type) {
@@ -124,22 +188,21 @@ class ProjectPlanEdit extends Component {
           total += parseFloat(element.expenditure)
         }
       })
-      // if (name === 'expenditure' && total > this.state.totalActualRecievedFund) {
-      //   alert("Expenditure cannot be more than recieved amounts")
-      //   return
-      // }
 
       this.setState({
         finances: finances,
         totalExpenditureFund: total
       });
-    } else if (type === "project_activities") {
+    } else if (type === "project_activity") {
       const { name, value } = e.target;
-      const project_activities = this.state.project_activities;
-      project_activities[idx][name] = value;
+      const project_activity = this.state.project_activity;
+      project_activity[idx][name] = value;
+      console.log(idx)
+      console.log(project_activity[idx][name])
       this.setState({
-        project_activities: project_activities,
+        project_activity: project_activity,
       });
+      console.log(this.state.project_activity)
     } else if (type === "other_activities") {
       const { name, value } = e.target;
       const other_activities = this.state.other_activities;
@@ -155,6 +218,55 @@ class ProjectPlanEdit extends Component {
         external_agency: external_agency,
       });
     }
+  }
+
+  // set Project Activity year wise 
+  onChangeYearProjectActivity(e) {
+    var thizz = this;
+    thizz.setState({
+      selectedYearProjectActivity: e.target.value
+    })
+    if (!e.target.value) {
+      alert("Please select year first");
+      return
+    }
+    axios.get(process.env.REACT_APP_BASE_URL + "/api" +
+      "/admin/fetch-project-activity/" + e.target.value + "/" + this.props.params.id)
+      .then((response) => {
+        console.log(response.data);
+        if (response.data.project_activity.length > 0) {
+          thizz.setState({
+            project_activity: response.data.project_activity
+          })
+        } else {
+          var obj = {
+            id: "",
+            project_master_activity_id: "",
+            project_master_activity_name: "",
+            project_master_sub_activity_id: "",
+            project_master_sub_activity_name: "",
+            project_master_sub_activity: [],
+            start_date: "",
+            end_date: "",
+            expected_entries: 1,
+            current_entries: 1,
+            year: "",
+            quarter: "",
+            tasks: [{
+              id: "",
+              task: "",
+    
+            }]
+          }
+          thizz.setState({
+            project_activity: [obj]
+          })
+        }
+
+
+      }).catch((error) => {
+        console.log(error.response.data);
+      })
   }
 
   onChangeYear(e) {
@@ -220,6 +332,32 @@ class ProjectPlanEdit extends Component {
       })
   }
 
+
+  handleSubActivity(idx, e) {
+    var thizz = this
+
+    if (!e.target.value) {
+      alert("Please select activity first");
+      return
+    }
+    axios.get(process.env.REACT_APP_BASE_URL + "/api" +
+      "/admin/subactivity/" + e.target.value)
+      .then((response) => {
+        console.log(response.data);
+        const project_activity = this.state.project_activity;
+        project_activity[idx]['project_master_sub_activity'] = response.data.project_master_sub_activity;
+        thizz.setState({
+          project_activity: project_activity,
+        });
+
+        
+
+      }).catch((error) => {
+        console.log(error.response.data);
+      })
+  }
+
+
   //Submit Form
   submitForm() {
     var thizz = this;
@@ -257,6 +395,7 @@ class ProjectPlanEdit extends Component {
 
   }
 
+
   componentDidMount() {
     console.log('Props:', this.props.params.id);
     var finance_recieved = this.state.finance_recieved
@@ -268,6 +407,8 @@ class ProjectPlanEdit extends Component {
 
     axios.get(process.env.REACT_APP_BASE_URL + "/api/admin/project-plan/" + this.props.params.id)
       .then((response) => {
+
+
         this.setState({
           singleFields: response.data.data,
           years: response.data.years,
@@ -275,9 +416,8 @@ class ProjectPlanEdit extends Component {
           project: response.data.projects,
           project_head: response.data.team_leader,
           funding_agency: response.data.agencys,
-
+          project_master_activity: response.data.project_master_activity
         })
-
 
         var financeesList = [];
         for (let i = 0; i < response.data.teamStrength.length; i++) {
@@ -357,6 +497,7 @@ class ProjectPlanEdit extends Component {
 
   }
 
+
   // For simple fields
   handleChange(e) {
     let singleField = this.state.singleFields;
@@ -371,15 +512,15 @@ class ProjectPlanEdit extends Component {
     if (type === "amountRecieved" && this.state.selectedYear && this.state.selectedQuarter) {
       const { name, value } = e.target;
       const finance_recieved = this.state.finance_recieved;
-      if('checked' in e.target) {
+      if ('checked' in e.target) {
         console.log(e.target.checked)
-        finance_recieved[idx][name] = e.target.checked === true ? true : false ;
-    }else{
-      finance_recieved[idx][name] = value;
+        finance_recieved[idx][name] = e.target.checked === true ? true : false;
+      } else {
+        finance_recieved[idx][name] = value;
 
-    }
-    
-    
+      }
+
+
       finance_recieved[idx]['project_plan_id'] = this.props.params.id
       finance_recieved[idx]['year'] = this.state.selectedYear
       let recievedAmountTotal = 0.00
@@ -427,6 +568,22 @@ class ProjectPlanEdit extends Component {
       this.setState({ external_agency: external_agency });
 
     }
+
+    if (this.state.project_activity.length > 1 && type === "project_activity") {
+      const project_activity = this.state.project_activity;
+      project_activity.splice(idx, 1);
+      this.setState({ project_activity: project_activity });
+    }
+  }
+
+  handleRemoveSpecificRowOfTask(pidx,cidx, type) {
+    const project_activity = this.state.project_activity;
+
+    if (project_activity[pidx]['tasks'].length > 1) {
+      project_activity[pidx]['tasks'].splice(cidx, 1);
+      this.setState({ project_activity: project_activity });
+    }
+    
   }
 
   handleAddRow(type) {
@@ -453,6 +610,59 @@ class ProjectPlanEdit extends Component {
         external_agency: [...this.state.external_agency, item],
       });
     }
+
+
+
+    if (type === "project_activity") {
+      var obj = {
+        id: "",
+        project_master_activity_id: "",
+        project_master_activity_name: "",
+        project_master_sub_activity_id: "",
+        project_master_sub_activity_name: "",
+        project_master_sub_activity: [],
+        start_date: "",
+        end_date: "",
+        expected_entries: 1,
+        current_entries: 1,
+        year: "",
+        quarter: "",
+        tasks: [{
+          id: "",
+          task: "",
+
+        }]
+      }
+      this.setState({
+        project_activity: [...this.state.project_activity, obj],
+      });
+
+    }
+
+  }
+
+  
+  handleAddRowTask(pidx, type) {
+    if (type === "project_activity_task") {
+      var obj = {
+        id: "",
+        task: "",
+
+      }
+      let projectActivity = this.state.project_activity
+      let current_entries = projectActivity[pidx].current_entries
+      let taskLength = projectActivity[pidx]['tasks'].length;
+      if(taskLength >= current_entries) {
+        alert("You cannot add more than Current Status");
+        return 
+      }
+      projectActivity[pidx]['tasks'].push(obj)
+      this.setState({
+        project_activity: projectActivity
+      });
+
+    }
+
   }
 
   render() {
@@ -468,6 +678,15 @@ class ProjectPlanEdit extends Component {
       return <option key={project.id} value={project.project_code}> {project.project_name} </option>;
 
     })
+    let activity = this.state.project_master_activity.map(function (activity, index) {
+      return <option key={activity.id} value={activity.id}> {activity.name} </option>;
+
+    })
+
+    // let sub_activity = this.state.project_master_sub_activity.map(function (activity, index) {
+    //   return <option key={activity.id} value={activity.id}> {activity.subactivy_name} </option>;
+
+    // })
 
     let team = this.state.project_head.map(function (team, index) {
       return <option key={team.id} value={team.employee_code}> {team.employee_name} </option>
@@ -783,7 +1002,7 @@ class ProjectPlanEdit extends Component {
                               </select>
                             </div>
                           </div>
-                          <div className="col-md-6">
+                          {/* <div className="col-md-6">
                             <div className="form-group">
                               <label htmlFor="projectName">Choose Quarter</label>
                               <select
@@ -800,7 +1019,7 @@ class ProjectPlanEdit extends Component {
                                 <option value="Q4"> Q4 </option>
                               </select>
                             </div>
-                          </div>
+                          </div> */}
 
 
                         </div>
@@ -808,6 +1027,7 @@ class ProjectPlanEdit extends Component {
                         {/* Received Payment */}
                         <p>Received Amount</p>
                         <div className="card">
+
                           <table className="table">
                             <thead className="thead-light card-header">
                               <th scope="col"> Adjustment? </th>
@@ -899,15 +1119,7 @@ class ProjectPlanEdit extends Component {
                             </tbody>
 
                           </table>
-                          {/* <div className="card-footer row">
-                            {this.state.resStatusFinanceReceived.messages !== '' ?
-                              (<div className={"p-2 form-control col-md-8 text-center " + (this.state.resStatusFinanceReceived.isError ? "alert-success" : "alert-danger")}>
-                                {this.state.resStatusFinanceReceived.messages}
-                              </div>)
-                              : ""}
-                            <button type="button" className="btn btn-primary col-md-2  ml-auto" onClick={this.saveAmount} > Save </button>
 
-                          </div> */}
                         </div>
                         {/* Calculation field  */}
                         <div className="card">
@@ -982,7 +1194,7 @@ class ProjectPlanEdit extends Component {
                                         type="text"
                                         className="form-control"
                                         id="allocated_fund"
-                                        
+
                                         placeholder="Allocated Fund"
                                         name="allocated_fund"
                                         onChange={(evnt) => this.handleChangeMul(idx, evnt, "finances")}
@@ -1024,76 +1236,174 @@ class ProjectPlanEdit extends Component {
                         </div>
 
 
-                        <p className="lead"> Project Activities </p>
-                        <div className="">
-                          <div className="table-responsive">
-                            <table className="table border">
-                              <thead className="thead-dark">
-                                <tr>
-                                  <th>Type</th>
-                                  <th>Start Date</th>
-                                  <th>End Date</th>
-                                  <th> Duration <small>in days</small> </th>
-                                  <th> Activities </th>
-                                  <th>Status</th>
-                                  <th> Progress</th>
-                                </tr>
-                              </thead>
-                              <tbody id="tbl3">
-                                {this.state.project_activities.map((item, idx) => (
-                                  <tr key={"pa-" + idx}>
-                                    <td>
-                                      {item.type.charAt(0).toUpperCase() + item.type.slice(1)}
-                                    </td>
-                                    <td style={{ width: "100px" }}>
-                                      {moment(item.start_date).format("DD-MM-YYYY")}
-                                    </td>
-                                    <td style={{ width: "100px" }}>
-                                      {moment(item.end_date).format("DD-MM-YYYY")}
-                                    </td>
-                                    <td>
+                        <p className="lead mt-5"> Project Activities </p>
+                        <div className="row">
+                          <div className="col-md-6">
+                            <div className="form-group">
+                              <label htmlFor="centreName">Choose Year </label>
+                              <select
+                                className="form-control "
+                                name="yearOfProjectActivity"
+                                id="yearOfProjectActivity"
+                                value={this.state.selectedYearProjectActivity}
+                                onChange={this.onChangeYearProjectActivity}
 
-                                      {item.duration}
-                                    </td>
-                                    <td>
-
-                                      <div className="card p-2" style={{ overflow: "auto", height: "100px" }}>
-                                        {item.activities}
-                                      </div>
-                                    </td>
-                                    <td>
-                                      <textarea
-                                        className="form-control "
-                                        id="status"
-                                        name="status"
-                                        placeholder="Fill the status of activities completed separated by comma"
-                                        onChange={(evnt) => this.handleChangeMul(idx, evnt, "project_activities")}
-                                        value={item.status}
-                                        style={{ width: "200px" }}
-
-                                      ></textarea>
-                                    </td>
-                                    <td>
-                                      <textarea
-                                        className="form-control "
-                                        id="progress"
-                                        name="progress"
-                                        placeholder="Submit the overall progress of the activities"
-                                        onChange={(evnt) => this.handleChangeMul(idx, evnt, "project_activities")}
-                                        value={item.progress}
-                                        style={{ width: "150px" }}
-                                        row={3}
-                                      ></textarea>
-                                    </td>
-
-                                  </tr>
-                                ))}
-                              </tbody>
-                            </table>
-
+                              >
+                                <option selected=""> select </option>
+                                {yearsSelectOption}
+                              </select>
+                            </div>
+                          </div>
+                          <div className="col-md-6">
+                            <div className="form-group">
+                              <button className="btn btn-primary" type="button" onClick={() => this.submitActivity("project_activity")} > Save Activity</button>
+                            </div>
                           </div>
                         </div>
-                        <p className="lead">External Agency</p>
+                        <div className="table-responsive">
+                          <table className="table">
+                            <thead className="thead-light card-header">
+                              <th> Category </th>
+                              <th> Sub Category </th>
+                              <th> Start Date </th>
+                              <th> End Date </th>
+                              <th> Expected Number  </th>
+                              <th> Current Status  </th>
+                              <th>Action  </th>
+                            </thead>
+                            <tbody className="card-body">
+                              {this.state.project_activity.map((ext, idx) => (
+                                <>
+                                  <tr key={"ea-" + idx}>
+                                    <td>
+                                      <select
+
+                                        name="project_master_activity_id"
+                                        id="project_master_activity_id"
+                                        value={ext.project_master_activity_id}
+                                        onChange={(evnt) => { this.handleChangeMul(idx, evnt, "project_activity"); this.handleSubActivity(idx, evnt) }}
+                                      >
+                                        <option value=''> select </option>
+                                        {activity}
+                                      </select>
+                                    </td>
+                                    <td>
+                                      <select
+                                        onChange={(evnt) => this.handleChangeMul(idx, evnt, "project_activity")}
+                                        name="project_master_sub_activity_id"
+                                        id="project_master_sub_activity_id"
+                                        value={ext.project_master_sub_activity_id}
+                                      >
+                                        <option value=''> select </option>
+                                        {ext.project_master_sub_activity.map((sub_activity, idx) => (
+                                            <option value={sub_activity.id}> {sub_activity.subactivy_name} </option>
+                                        ))}
+                                      </select>
+                                    </td>
+                                    <td>  <input
+                                      type="date"
+                                      name="start_date"
+                                      id="start_date"
+                                      value={ext.start_date}
+                                      onChange={(evnt) => this.handleChangeMul(idx, evnt, "project_activity")}
+                                    /> </td>
+                                    <td>   <input
+                                      type="date"
+                                      name="end_date"
+                                      id="end_date"
+                                      value={ext.end_date}
+                                      onChange={(evnt) => this.handleChangeMul(idx, evnt, "project_activity")}
+                                    /> </td>
+                                    <td> <input
+                                      type="text"
+                                      style={{ width: "50px" }}
+                                      id="expected_entries"
+                                      name="expected_entries"
+                                      value={ext.expected_entries}
+                                      onChange={(evnt) => this.handleChangeMul(idx, evnt, "project_activity")}
+                                    />
+
+                                    </td>
+                                    <td> <input
+                                      type="text"
+                                      style={{ width: "50px" }}
+                                      id="current_entries"
+                                      name="current_entries"
+                                      value={ext.current_entries}
+                                      onChange={(evnt) => this.handleChangeMul(idx, evnt, "project_activity")}
+                                    /> </td>
+
+                                    <td >
+                                      <button
+                                        type="button"
+                                        className="bg-success"
+                                        onClick={() => this.handleAddRow("project_activity")}
+                                      >
+                                        +
+                                      </button>
+                                      <button
+                                        type="button"
+                                        className="bg-danger"
+                                        onClick={() => this.handleRemoveSpecificRow(idx, "project_activity")}
+                                      >
+                                        -
+                                      </button>
+                                    </td>
+                                  </tr>
+                                  <tr>
+                                    <td colSpan="7" style={{ padding: "30px" }}>
+                                      <table className="table table-borderless">
+                                        <thead className="thead-light card-header">
+                                          <tr>
+                                            <th>Index</th>
+                                            <th>Task</th>
+                                            <th>Action</th>
+                                          </tr>
+                                        </thead>
+                                        <tbody>
+                                          {ext.tasks.map((task, iidx) => (
+                                            <tr key={'task' + iidx}>
+                                              <td>{iidx + 1}</td>
+                                              <td> <input
+                                                type="text"
+                                                name="task"
+                                                id="task"
+                                                className="form-control"
+                                                value={task.task}
+                                                onChange={(evnt) => this.handleChangeMulTask(idx,iidx, evnt, "project_activity_task")}
+                                               
+
+                                              />  </td>
+                                              <td >
+                                                <button
+                                                  type="button"
+                                                  className="bg-success"
+                                                  onClick={() => this.handleAddRowTask(idx, 'project_activity_task')}
+                                                >
+                                                  +
+                                                </button>
+                                                <button
+                                                  type="button"
+                                                  className="bg-danger"
+                                                  onClick={() => this.handleRemoveSpecificRowOfTask(idx, iidx, "project_activity_task")}
+                                                >
+                                                  -
+                                                </button>
+                                              </td>
+                                            </tr>
+                                          ))}
+                                        </tbody>
+                                      </table>
+                                    </td>
+                                  </tr>
+                                </>
+                              ))}
+                            </tbody>
+
+                          </table>
+                        </div>
+
+                        <p className="lead mt-5">External Agency</p>
 
                         <table className="table">
                           <thead className="thead-light card-header">

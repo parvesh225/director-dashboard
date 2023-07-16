@@ -49,7 +49,10 @@ router.post('/admin/project-plan',projectPlanController.insert);
 
 router.put('/admin/project-plan',projectPlanController.edit);
 router.get('/admin/project-plan/:id',projectPlanController.fetchProjectPlan);
+router.get('/admin/subactivity/:activityMasterId',projectPlanController.readSubCategory);
 router.get('/admin/fetch-finances-by-year-project/:year/:projectPlanId',projectPlanController.fetchProjectPlanFinances);
+router.post('/admin/save-finances-by-year-project/:year/:projectPlanId',projectPlanController.saveProjectActivitywithTask);
+router.get('/admin/fetch-project-activity/:year/:projectPlanId',projectPlanController.readProjectActivity);
 router.post('/admin/fetch-finances-by-year-project',projectPlanController.saveProjectPlanFinancesBudget);
 //End Project Plan
 

@@ -3,7 +3,7 @@ const { TeamStrength } = require("../../models/TeamStrength");
 const { Team } = require("../../models/Team");
 const { Finances } = require("../../models/Finances");
 const { FinanceBudget } = require("../../models/FinanceBudget");
-const { ProjectActivitie } = require("../../models/ProjectActivitie");
+const { ProjectActivity } = require("../../models/ProjectActivity");
 const { OtherActivitie } = require("../../models/OtherActivitie");
 const { Centre } = require("../../models/Centre");
 const { Project } = require("../../models/Project");
@@ -11,6 +11,9 @@ const { TeamLeader } = require("../../models/TeamLeader");
 const { FundingAgency } = require("../../models/FundingAgency");
 const { FinanceRecieved } = require("../../models/FinanceRecieved");
 const { db } = require("../../utils/db.utill");
+const { ProjectMasterActivity } = require("../../models/ProjectMasterActivity");
+const { ProjectMasterSubActivity } = require("../../models/ProjectMasterSubActivity");
+const { ProjectActivityTask } = require("../../models/ProjectActivityTask");
 
 async function fetchMasterData(req, res, next) {
   try {
@@ -116,11 +119,11 @@ async function insert(req, res, next) {
         })
       }
     }
-     
+
   }
 
-//transaction begin
-const t = await db.transaction();
+  //transaction begin
+  const t = await db.transaction();
   try {
     let project = await ProjectPlan.create({
       centre_name: req.body.FormData.centre_name,
@@ -136,7 +139,7 @@ const t = await db.transaction();
       end_date: req.body.FormData.end_date,
 
     }, {
-      transaction:t
+      transaction: t
     });
     // Team Strength
 
@@ -150,7 +153,7 @@ const t = await db.transaction();
           "qualification": req.body.team_strength[i].qualification,
           "salary_slab": req.body.team_strength[i].salary_slab
         }, {
-          transaction:t
+          transaction: t
         })
       }
     }
@@ -165,7 +168,7 @@ const t = await db.transaction();
           "allocated_fund": req.body.finances[i].allocated_fund,
           "milestone": req.body.finances[i].milestone,
         }, {
-          transaction:t
+          transaction: t
         })
       }
     }
@@ -173,7 +176,7 @@ const t = await db.transaction();
     // Project Activities
     if (req.body.project_activities) {
       for (var i = 0; i < req.body.project_activities.length; i++) {
-        await ProjectActivitie.create({
+        await ProjectActivity.create({
           "project_plan_id": project.id,
           "type": req.body.project_activities[i].type,
           "start_date": req.body.project_activities[i].start_date,
@@ -182,7 +185,7 @@ const t = await db.transaction();
           "activities": req.body.project_activities[i].activities,
           "remarks": req.body.project_activities[i].remarks
         }, {
-          transaction:t
+          transaction: t
         })
       }
     }
@@ -197,14 +200,14 @@ const t = await db.transaction();
             "activities": req.body.other_activities[i].other_activity,
             "date": req.body.other_activities[i].other_date
           }, {
-            transaction:t
+            transaction: t
           })
         }
       }
     }
 
-     //if successfully insert  data in all table
-    await t.commit(); 
+    //if successfully insert  data in all table
+    await t.commit();
 
     // Success Message Return
     return res.status(200).json({
@@ -212,9 +215,9 @@ const t = await db.transaction();
       "message": "Data inserted successfully!",
       "data": req.body
     });
-    
+
   } catch (error) {
-    await t.rollback(); 
+    await t.rollback();
     return res.status(500).json({
       "status": false,
       "message": error.message,
@@ -226,7 +229,7 @@ const t = await db.transaction();
 }
 async function edit(req, res, next) {
 
-  if(!req.body.finance_recieved) {
+  if (!req.body.finance_recieved) {
     return res.status(500).json({
       "status": false,
       "message": "Please select year & quarter"
@@ -235,21 +238,21 @@ async function edit(req, res, next) {
 
   if (req.body.finance_recieved) {
     var isValid = true;
-    for(var j =0; j<req.body.finance_recieved.length; j++) {
+    for (var j = 0; j < req.body.finance_recieved.length; j++) {
       var objV = req.body.finance_recieved[j];
-      if(!objV.amount_recieved || !objV.amount_recieved_date) {
+      if (!objV.amount_recieved || !objV.amount_recieved_date) {
         isValid = false
       }
     }
 
-    if(isValid === false) {
+    if (isValid === false) {
       return res.status(500).json({
         "status": false,
         "message": "Invalid data to save in received amount. Please select year & quarter"
       })
     }
   }
-  
+
   try {
     const projectPlan = await ProjectPlan.findOne({
       where: {
@@ -288,7 +291,7 @@ async function edit(req, res, next) {
     // Project Activities
     if (req.body.project_activities) {
       for (var i = 0; i < req.body.project_activities.length; i++) {
-        const ts = await ProjectActivitie.findOne({
+        const ts = await ProjectActivity.findOne({
           where: {
             id: req.body.project_activities[i].id
           }
@@ -315,8 +318,8 @@ async function edit(req, res, next) {
         })
       }
     }
-   
- 
+
+
     //Other Activities
     if (req.body.other_activities) {
       for (var i = 0; i < req.body.other_activities.length; i++) {
@@ -334,14 +337,14 @@ async function edit(req, res, next) {
 
     if (req.body.finance_recieved) {
       var isValid = true;
-      for(var j =0; j<req.body.finance_recieved.length; j++) {
+      for (var j = 0; j < req.body.finance_recieved.length; j++) {
         var objV = req.body.finance_recieved[j];
-        if(!objV.amount_recieved || !objV.amount_recieved_date) {
+        if (!objV.amount_recieved || !objV.amount_recieved_date) {
           isValid = false
         }
       }
 
-      if(isValid === false) {
+      if (isValid === false) {
         return res.status(500).json({
           "status": false,
           "message": "Invalid data to save in received amount"
@@ -365,7 +368,7 @@ async function edit(req, res, next) {
         })
       }
     }
-    
+
 
 
     // Success Message Return
@@ -383,6 +386,8 @@ async function edit(req, res, next) {
   }
 
 }
+
+
 
 async function fetchProjectPlan(req, res, next) {
   try {
@@ -420,9 +425,17 @@ async function fetchProjectPlan(req, res, next) {
 
 
     //Project Activity
-    let project_activity = await ProjectActivitie.findAll({
+    let project_activity = await ProjectActivity.findAll({
       where: { project_plan_id: `${project.id}` }
     });
+
+    // new Project Activity
+
+    let project_activity2 = await ProjectMasterActivity.findAll({
+      attributes: ['id', 'name']
+    });
+
+
 
     //Other Activity
     let other_activity = await OtherActivitie.findAll({
@@ -442,13 +455,14 @@ async function fetchProjectPlan(req, res, next) {
       data: project,
       years: years,
       teams: teams,
-      projectActivity: project_activity,
+      projectActivity: [],
       otherActivity: other_activity,
       centres: centres,
       projects: projects,
       team_leader: team_leader,
       agencys: agencys,
-      teamStrength: teamStrength
+      teamStrength: teamStrength,
+      project_master_activity: project_activity2
     });
 
   } catch (error) {
@@ -462,6 +476,80 @@ async function fetchProjectPlan(req, res, next) {
 
 
 }
+
+async function readSubCategory(req, res, next) {
+  try {
+    let master_activity_id = req.params.activityMasterId;
+
+
+    const subCatagoryList = await ProjectMasterSubActivity.findAll({
+      where: {
+        project_activty_id: master_activity_id
+      }
+    });
+
+    // Success Message Return
+    return res.status(200).json({
+      status: true,
+      project_master_sub_activity: subCatagoryList
+
+    });
+  } catch (error) {
+    return res.status(501).json({
+      status: false,
+      message: error.message
+    })
+  }
+}
+
+async function readProjectActivity(req, res, next) {
+  try {
+    let year = req.params.year;
+    let projectPlanId = req.params.projectPlanId;
+
+
+    const project_activities = await ProjectActivity.findAll({
+      where: {
+        year: year,
+        project_plan_id: projectPlanId
+      }
+    });
+
+    let obj = []
+    for (var i = 0; i < project_activities.length; i++) {
+      let eachObj = project_activities[i]
+      const tasks = await readTaskByProjectActivity(eachObj.id)
+      eachObj.tasks = tasks
+      const masterSubActivity = await ProjectMasterSubActivity.findAll({
+        where: {
+          project_activty_id: eachObj.project_master_activity_id
+        }
+      })
+      eachObj.project_master_sub_activity =masterSubActivity
+      obj.push(eachObj)
+    }
+
+    // Success Message Return
+    return res.status(200).json({
+      status: true,
+      project_activity: obj
+
+    });
+  } catch (error) {
+    return res.status(501).json({
+      status: false,
+      message: error.message
+    })
+  }
+}
+async function readTaskByProjectActivity(id) {
+  return await ProjectActivityTask.findAll({
+    where: {
+      project_activity_id: id
+    }
+  });
+}
+
 async function projectPlanList(req, res, next) {
   try {
     let dataList = await ProjectPlan.findAll();
@@ -567,13 +655,109 @@ async function saveProjectPlanFinancesBudget(req, res, next) {
 
 }
 
+async function saveProjectActivitywithTask(req, res, next) {
+    let year = req.params.year;
+    let projectPlanId = req.params.projectPlanId;
+    let requestData = req.body;
+    console.log(requestData);
 
-module.exports = {
-  insert,
-  fetchMasterData,
-  fetchProjectPlan,
-  projectPlanList,
-  fetchProjectPlanFinances,
-  saveProjectPlanFinancesBudget,
-  edit
-}
+    const project_activities = await ProjectActivity.findAll({
+      where: {
+        year: year,
+        project_plan_id: projectPlanId
+      }
+    });
+
+    console.log(project_activities);
+
+    //destroy all select task by year and plain id
+    project_activities.forEach((item, index) => {
+      deleteTaskByProjectActivity(item.id)
+    });
+
+    //destroy all select activity by year and plain id
+    await ProjectActivity.destroy({
+      where: {
+        year: year,
+        project_plan_id: projectPlanId
+      }
+    });
+
+    const t = await db.transaction();
+
+    for (var i = 0; i < requestData.length; i++) {
+      let obj = requestData[i];
+      const masterActivity = await ProjectMasterActivity.findOne({
+        where: {
+          id: obj.project_master_activity_id
+        }
+      })
+      const masterSubActivity = await ProjectMasterSubActivity.findOne({
+        where: {
+          project_activty_id: obj.project_master_activity_id,
+          id: obj.project_master_sub_activity_id
+        }
+      })
+
+      let projectActivity = await ProjectActivity.create({
+        project_plan_id: projectPlanId,
+        project_master_activity_id: obj.project_master_activity_id,
+        project_master_activity_name: masterActivity.name,
+        project_master_sub_activity_id: obj.project_master_sub_activity_id,
+        project_master_sub_activity_name: masterSubActivity.subactivy_name,
+        start_date: obj.start_date,
+        end_date: obj.end_date,
+        expected_entries: obj.expected_entries,
+        current_entries: obj.current_entries,
+        year: year
+      }, {
+        transaction: t
+      });
+      for (var j = 0; j < obj.tasks.length; j++) {
+        let task = obj.tasks[j];
+        let projectActivityTask = await ProjectActivityTask.create({
+          project_plan_id: projectPlanId,
+          project_activity_id: projectActivity.id,
+          task: task.task
+  
+        }, {  
+          transaction: t
+        });
+  
+
+      }
+
+    }
+
+      // Success Message Return
+      await t.commit();
+
+      // Success Message Return
+      return res.status(200).json({
+        "status": true,
+        "message": "Data inserted successfully!"
+      });
+    
+
+  }
+
+async function deleteTaskByProjectActivity(id) {
+    await ProjectActivityTask.destroy({
+      where: {
+        project_activity_id: id
+      }
+    });
+  }
+
+  module.exports = {
+    insert,
+    fetchMasterData,
+    fetchProjectPlan,
+    projectPlanList,
+    fetchProjectPlanFinances,
+    saveProjectPlanFinancesBudget,
+    edit,
+    readSubCategory,
+    readProjectActivity,
+    saveProjectActivitywithTask
+  }
