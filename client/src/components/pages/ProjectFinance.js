@@ -54,7 +54,7 @@ class ProjectFinance extends Component {
     axios.get(process.env.REACT_APP_BASE_URL + "/api/admin/project-finance-details/" + this.props.params.id)
       .then((response) => {
         if (response.data.status) {
-          let fundList = response.data;
+          // let fundList = response.data;
           var financeList = this.state.financeList;
           financeList = response.data.financeList;
           this.setState({
@@ -110,7 +110,7 @@ class ProjectFinance extends Component {
                           <th scope="row"> {index + 1}</th>
                           <td>{item.budget_head.toUpperCase()}</td>
                           <td>{this.formattedNumber(item.allocated_fund)}</td>
-                          <td> {this.formattedNumber((index == 2) ? this.state.totalReceivedAmt : '')} </td>
+                          <td> {this.formattedNumber((index === 2) ? this.state.totalReceivedAmt : '')} </td>
                           <td>{this.formattedNumber(item.expenditure ? item.expenditure : 0)}</td>
                           <td> {Math.round((item.expenditure / item.allocated_fund) * 100)}% </td>
                         </tr>

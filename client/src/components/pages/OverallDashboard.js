@@ -15,45 +15,45 @@ class OverallDashboard extends Component {
         super(props);
         this.state = {
             allocatedBudget: 0.00,
-            recivedAmt:0.00,
-            utilizeAmt:0.00,
-            balanceAmt:0.00
+            recivedAmt: 0.00,
+            utilizeAmt: 0.00,
+            balanceAmt: 0.00
         }
         this.formattedNumber = this.formattedNumber.bind(this);
     }
 
     formattedNumber(val) {
-        const formattedValue =  parseInt(val).toLocaleString(); 
+        const formattedValue = parseInt(val).toLocaleString();
         return formattedValue;
-      }
+    }
     componentDidMount() {
         console.log('Props:', this.props.params.id);
-      
 
-        axios.get(process.env.REACT_APP_BASE_URL + "/api/admin/overall-dashboard/"+this.props.params.id)
-          .then((response) => {
-            console.log(response.data)
-            var actualResp = response.data
-            if(actualResp.totalfund){
-                this.setState({allocatedBudget: actualResp.totalfund})    
-            }
 
-            if(actualResp.receivedAmt){
-                this.setState({recivedAmt: actualResp.receivedAmt[0].amount_recieved})    
+        axios.get(process.env.REACT_APP_BASE_URL + "/api/admin/overall-dashboard/" + this.props.params.id)
+            .then((response) => {
+                console.log(response.data)
+                var actualResp = response.data
+                if (actualResp.totalfund) {
+                    this.setState({ allocatedBudget: actualResp.totalfund })
+                }
 
-            }
+                if (actualResp.receivedAmt) {
+                    this.setState({ recivedAmt: actualResp.receivedAmt[0].amount_recieved })
 
-            if(actualResp.utilizedAmt){
-                this.setState({utilizeAmt: actualResp.utilizedAmt[0].expenditure})    
-            }
+                }
 
-            this.setState({balanceAmt: actualResp.balance})
-    
-          }).catch((error) => {
-            console.log(error.response);
-          })
-    
-      }
+                if (actualResp.utilizedAmt) {
+                    this.setState({ utilizeAmt: actualResp.utilizedAmt[0].expenditure })
+                }
+
+                this.setState({ balanceAmt: actualResp.balance })
+
+            }).catch((error) => {
+                console.log(error.response);
+            })
+
+    }
     render() {
         return (
             <>
@@ -66,25 +66,25 @@ class OverallDashboard extends Component {
                         <div className="container-fluid">
                             {/* Small boxes (Stat box) */}
                             <h3 className="text-center text-white mt-3"> Centre for Digital Governance (CDG) </h3>
-                            <Link to ="/">
-                            <button style={{float:"right"}} className="btn btn-primary"> <i className="fa fa-arrow-left font-weight-bold" />   </button>
+                            <Link to="/">
+                                <button style={{ float: "right" }} className="btn btn-primary"> <i className="fa fa-arrow-left font-weight-bold" />   </button>
                             </Link>
                             <p className="p-2 text-white lead text">Funding Information</p>
                             <div className="row">
                                 <div className="col-md-3 col-6">
                                     {/* small box */}
-                                   <Link to="/fund-wise-project-list">
-                                   <div className="small-box card customcolor">
-                                        <div className="icon">
-                                            <i className="fa fa-globe text-primary" style={{
-                                                fontSize: "30px",
-                                                top: "15px", right: "20px"
-                                            }} />
+                                    <Link to="/fund-wise-project-list">
+                                        <div className="small-box card customcolor">
+                                            <div className="icon">
+                                                <i className="fa fa-globe text-primary" style={{
+                                                    fontSize: "30px",
+                                                    top: "15px", right: "20px"
+                                                }} />
+                                            </div>
+                                            <p className="text-dark"> Sanctioned Fund(INR) </p>
+                                            <h5 className="small-box-footer"> {this.formattedNumber(this.state.allocatedBudget)} </h5>
                                         </div>
-                                        <p className="text-dark"> Sanctioned Fund(INR) </p>
-                                        <h5 className="small-box-footer"> {this.formattedNumber(this.state.allocatedBudget)} </h5>
-                                    </div>
-                                   </Link>
+                                    </Link>
                                 </div>
 
                                 <div className="col-md-3 col-6">
@@ -134,25 +134,26 @@ class OverallDashboard extends Component {
                             <div className="row">
                                 <div className="col-md-3 col-6">
                                     {/* small box */}
-                                    <div className="small-box card">
-                                        <div className="icon">
-                                            <i className="fa fa-refresh" style={{
-                                                 fontSize: "30px",
-                                                top: "15px", right: "20px"
-                                            }} />
+                                    <Link to="/bar-chart">
+                                        <div className="small-box card">
+                                            <div className="icon">
+                                                <i className="fa fa-refresh" style={{
+                                                    fontSize: "30px",
+                                                    top: "15px", right: "20px"
+                                                }} />
+                                            </div>
+                                            <p> Total Projects </p>
+                                            <h5 className="small-box-footer"> 1 </h5>
                                         </div>
-                                        <p> Total Projects </p>
-                                        <h5 className="small-box-footer"> 1 </h5>
-                                    </div>
+                                    </Link>
                                 </div>
-
 
                                 <div className="col-md-3 col-6">
                                     {/* small box */}
                                     <div className="small-box card">
                                         <div className="icon">
                                             <i className="fa fa-th-list text-success" style={{
-                                                 fontSize: "30px",
+                                                fontSize: "30px",
                                                 top: "15px", right: "20px",
                                             }} />
                                         </div>
@@ -166,7 +167,7 @@ class OverallDashboard extends Component {
                                     <div className="small-box card">
                                         <div className="icon">
                                             <i className="fa fa-files-o text-warning" style={{
-                                                 fontSize: "30px",
+                                                fontSize: "30px",
                                                 top: "15px", right: "20px"
                                             }} />
                                         </div>
@@ -174,7 +175,7 @@ class OverallDashboard extends Component {
                                         <h5 className="small-box-footer"> 1 </h5>
                                     </div>
                                 </div>
-                                
+
 
 
                             </div>

@@ -14,14 +14,13 @@ import OverallDashboard from './components/pages/OverallDashboard';
 import FundWiseProjectList from './components/pages/FundWiseProjectList';
 import FundWiseProjectDetail from './components/pages/FundWiseProjectDetails';
 import ProjectFinance from './components/pages/ProjectFinance';
+import ProjectActivityGraph from './components/pages/ProjectActivityGraph';
 
 class App extends Component {
   render() {
     return <>
     <Routes>
-      {/* <Route path={""}  element={<Login/>} ></Route>
-      <Route path={"/"}  element={<Login/>} ></Route>
-      <Route path={"/register"}  element={<Register/>} ></Route> */}
+      
       <Route path={"/admin/dashboard"}  element={<Dashboard/>} ></Route>
       <Route path={"/admin/centre"}  element={<Centre/>} ></Route>
       <Route path={"/admin/centre-edit/:id"}  element={<Centre/>} ></Route>
@@ -36,6 +35,7 @@ class App extends Component {
       <Route path={"/overall-dashboard/:id"}  element={<OverallDashboard/>} ></Route>
       <Route path={"/fund-wise-project-list"}  element={<FundWiseProjectList/>} ></Route>
       <Route path={"/fund-wise-project-detail"}  element={<FundWiseProjectDetail/>} ></Route>
+      <Route path={"/bar-chart"}  element={<ProjectActivityGraph/>} ></Route>
       
       
      

@@ -3,7 +3,7 @@ import Footer from "../layout/Footer";
 import Header from "../layout/Header";
 import Sidebar from "../layout/Sidebar";
 import './ProjectPlan2.css';
-import moment from 'moment';
+// import moment from 'moment';
 const axios = require("axios").default;
 
 class ProjectPlan extends Component {

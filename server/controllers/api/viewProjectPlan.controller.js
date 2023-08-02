@@ -3,7 +3,7 @@ const { TeamStrength } = require("../../models/TeamStrength");
 const { Team } = require("../../models/Team");
 const { Finances } = require("../../models/Finances");
 const { FinanceBudget } = require("../../models/FinanceBudget");
-const { ProjectActivitie } = require("../../models/ProjectActivity");
+const { ProjectActivity } = require("../../models/ProjectActivity");
 const { OtherActivitie } = require("../../models/OtherActivitie");
 const { Centre } = require("../../models/Centre");
 const { Project } = require("../../models/Project");
@@ -99,7 +99,75 @@ async function fundingDetail(req, res, next) {
 
 
 }
+
+async function projectActivityGraph(req, res, next) { 
+  try {
+
+    let id = req.params.id;
+    let year = req.params.year;
+
+
+    let project = await ProjectPlan.findOne({
+      where: { id: `${id}` }
+    });
+
+    
+
+    if (!project) {
+      throw new Error("Project not found ");
+    }
+
+
+    // Find Years List
+    var startDate = project.start_date;
+    var startYear = startDate.getFullYear();
+
+    var endDate = project.end_date;
+    var endYear = endDate.getFullYear();
+    var years = Array();
+
+    for (i = startYear; i <= endYear; i++) years.push(i);
+
+    // End Find Years List
+    let whereObj = {
+      project_plan_id: id
+    }
+    if(year && year != 'All'){
+      whereObj.year = year
+    }
+    let subCatagoryList = await ProjectActivity.findAll({
+      where: whereObj
+    });
+    let customObj = [];
+    for (i = 0; i < subCatagoryList.length; i++){
+        var obj = subCatagoryList[i]
+        customObj.push({
+          name: obj.project_master_activity_name,
+          totalActivities: obj.expected_entries,
+          currentActivities: obj.current_entries
+        })
+    }
+    
+    // Success Message Return
+    return res.status(200).json({
+      status: true,
+      years: years,
+      projectActivity : customObj
+    });
+
+
+  }catch (error) {
+    return res.status(501).json({
+      status: false,
+      message: error.message
+    })
+
+  }
+ }
+
+
 module.exports = {
   overallDashboard,
-  fundingDetail
+  fundingDetail,
+  projectActivityGraph
 }

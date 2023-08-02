@@ -125,9 +125,9 @@ class ProjectPlanEdit extends Component {
     this.submitActivity = this.submitActivity.bind(this);
   }
 
-  
-  
-  
+
+
+
 
 
   // For simple fields
@@ -135,37 +135,37 @@ class ProjectPlanEdit extends Component {
     this.setState({ selectedQuarter: e.target.value });
   }
 
-  submitActivity () {
+  submitActivity() {
     var thizz = this;
-    
+
     //Send request to backend
     axios({
       method: "post",
-      url: process.env.REACT_APP_BASE_URL + "/api/admin/save-finances-by-year-project/"+thizz.state.selectedYearProjectActivity+"/"+thizz.props.params.id,
+      url: process.env.REACT_APP_BASE_URL + "/api/admin/save-finances-by-year-project/" + thizz.state.selectedYearProjectActivity + "/" + thizz.props.params.id,
       data: thizz.state.project_activity
     }).then(function (response) {
       var data = response.data
       if (data.status === true && data) {
-       alert(data.message)
+        alert(data.message)
       }
 
     }).catch(function (error) {
       console.log(error.response.data)
       var data = error.response.data;
       if (error.response.data.status === false) {
-        alert('Error:' +  data.message)
+        alert('Error:' + data.message)
       }
     })
   }
 
 
-  handleChangeMulTask (pidx, cidx, e, type) {
-      const { name, value } = e.target;
-      const project_activity = this.state.project_activity;
-      project_activity[pidx]['tasks'][cidx][name] = value;
-      this.setState({
-        project_activity: project_activity,
-      });
+  handleChangeMulTask(pidx, cidx, e, type) {
+    const { name, value } = e.target;
+    const project_activity = this.state.project_activity;
+    project_activity[pidx]['tasks'][cidx][name] = value;
+    this.setState({
+      project_activity: project_activity,
+    });
   }
 
 
@@ -255,7 +255,7 @@ class ProjectPlanEdit extends Component {
             tasks: [{
               id: "",
               task: "",
-    
+
             }]
           }
           thizz.setState({
@@ -350,7 +350,7 @@ class ProjectPlanEdit extends Component {
           project_activity: project_activity,
         });
 
-        
+
 
       }).catch((error) => {
         console.log(error.response.data);
@@ -576,14 +576,14 @@ class ProjectPlanEdit extends Component {
     }
   }
 
-  handleRemoveSpecificRowOfTask(pidx,cidx, type) {
+  handleRemoveSpecificRowOfTask(pidx, cidx, type) {
     const project_activity = this.state.project_activity;
 
     if (project_activity[pidx]['tasks'].length > 1) {
       project_activity[pidx]['tasks'].splice(cidx, 1);
       this.setState({ project_activity: project_activity });
     }
-    
+
   }
 
   handleAddRow(type) {
@@ -641,7 +641,7 @@ class ProjectPlanEdit extends Component {
 
   }
 
-  
+
   handleAddRowTask(pidx, type) {
     if (type === "project_activity_task") {
       var obj = {
@@ -652,9 +652,9 @@ class ProjectPlanEdit extends Component {
       let projectActivity = this.state.project_activity
       let current_entries = projectActivity[pidx].current_entries
       let taskLength = projectActivity[pidx]['tasks'].length;
-      if(taskLength >= current_entries) {
+      if (taskLength >= current_entries) {
         alert("You cannot add more than Current Status");
-        return 
+        return
       }
       projectActivity[pidx]['tasks'].push(obj)
       this.setState({
@@ -1235,7 +1235,6 @@ class ProjectPlanEdit extends Component {
                           </div>
                         </div>
 
-
                         <p className="lead mt-5"> Project Activities </p>
                         <div className="row">
                           <div className="col-md-6">
@@ -1256,7 +1255,8 @@ class ProjectPlanEdit extends Component {
                           </div>
                           <div className="col-md-6">
                             <div className="form-group">
-                              <button className="btn btn-primary" type="button" onClick={() => this.submitActivity("project_activity")} > Save Activity</button>
+                              <label htmlFor="saveActivity">Save Activity </label>
+                              <button className="form-control btn btn-primary" type="button" onClick={() => this.submitActivity("project_activity")} > Submit </button>
                             </div>
                           </div>
                         </div>
@@ -1293,10 +1293,11 @@ class ProjectPlanEdit extends Component {
                                         name="project_master_sub_activity_id"
                                         id="project_master_sub_activity_id"
                                         value={ext.project_master_sub_activity_id}
+                                        style={{ width: "233px" }}
                                       >
                                         <option value=''> select </option>
                                         {ext.project_master_sub_activity.map((sub_activity, idx) => (
-                                            <option value={sub_activity.id}> {sub_activity.subactivy_name} </option>
+                                          <option value={sub_activity.id}> {sub_activity.subactivy_name} </option>
                                         ))}
                                       </select>
                                     </td>
@@ -1308,6 +1309,7 @@ class ProjectPlanEdit extends Component {
                                       onChange={(evnt) => this.handleChangeMul(idx, evnt, "project_activity")}
                                     /> </td>
                                     <td>   <input
+                                    
                                       type="date"
                                       name="end_date"
                                       id="end_date"
@@ -1370,8 +1372,8 @@ class ProjectPlanEdit extends Component {
                                                 id="task"
                                                 className="form-control"
                                                 value={task.task}
-                                                onChange={(evnt) => this.handleChangeMulTask(idx,iidx, evnt, "project_activity_task")}
-                                               
+                                                onChange={(evnt) => this.handleChangeMulTask(idx, iidx, evnt, "project_activity_task")}
+
 
                                               />  </td>
                                               <td >

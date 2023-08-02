@@ -4,7 +4,7 @@ import Header from "../layout/Header";
 import Sidebar from "../layout/Sidebar";
 import { Link } from "react-router-dom";
 import './Dashboard.css';
-const axios = require("axios").default;
+// const axios = require("axios").default;
 
 
 

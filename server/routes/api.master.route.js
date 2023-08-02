@@ -59,5 +59,6 @@ router.post('/admin/fetch-finances-by-year-project',projectPlanController.savePr
 
 //Frontend
 router.get('/admin/overall-dashboard/:id',overallDashboardController.overallDashboard);
+router.get('/project-activity-graph/:id/:year?',overallDashboardController.projectActivityGraph);
 router.get('/admin/project-finance-details/:id',overallDashboardController.fundingDetail);
 module.exports = router;
