@@ -1,0 +1,54 @@
+.headingLine {
+  font-size: 32px;
+  text-align: center;
+  font-family: "Roboto Condensed";
+}
+.fa-bar-chart {
+  font-size: xx-large;
+  /* background-color: brown; */
+  color: #007BFF;
+  /* width: 250px; */
+  padding: 10px;
+  border-radius:0cap;
+}
+
+
+.header-container {
+  text-align: left; /* Or 'center' if you want to center-align */
+}
+
+.icon {
+  display: inline-block;
+  vertical-align: middle;
+  margin-right: 20px; /* Add space between icon and header */
+}
+
+.header {
+  display: inline-block;
+  vertical-align: middle;
+  /* Set your header's styles */
+}
+
+.container-fluid,.card {
+  position: relative;
+    display: -ms-flexbox;
+    display: flow;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    min-width: 0;
+    word-wrap: break-word;
+    background-color: #fff;
+    background-clip: border-box;
+    border: 0 solid rgba(0,0,0,.125);
+    border-radius: 0.25rem;
+}
+
+.p1 {
+  font-size: 16px !important;
+  color: #585858 !important;
+}
+.p2 {
+  font-size: 24px;
+  font-weight: 500;
+  color: #000;
+}

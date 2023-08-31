@@ -7,10 +7,11 @@ class Sidebar extends Component {
             <>
                 <aside className="main-sidebar sidebar-dark-primary elevation-4" style={{ backgroundColor: "#111111" }}>
                     {/* Brand Logo */}
-                    <a href="index3.html" className="brand-link">
-                        <img src={logo} alt="AdminLTE Logo" className="brand-image" style={{ opacity: '.8' }} />
-                        <span className="brand-text font-weight-light">Intranet</span>
-                    </a>
+                   
+                    
+                    <div className="user-panel mt-3 pb-3 mb-3 d-flex">
+                    <img src={logo} alt="AdminLTE Logo" className="brand-image" style={{ opacity: '.8', width:"130px", marginLeft:"20px" }} />
+                        </div>
                     {/* Sidebar */}
                     <div className="sidebar">
                         {/* Sidebar user panel (optional) */}
@@ -19,8 +20,8 @@ class Sidebar extends Component {
                                 <img src={`/assets/dist/img/user2-160x160.jpg`} className="img-circle elevation-2" alt="userImage" />
                             </div>
                             <div className="info">
-                                <a href="#/" className="d-block">Parvesh Mishra</a>
-                                <small>ADMIN</small>
+                                <a href="#/" className="d-block">Hitesh Vaidya</a>
+                                <small className='text-white'>Super Admin</small>
                             </div>
                         </div>
                         {/* SidebarSearch Form */}
@@ -31,13 +32,13 @@ class Sidebar extends Component {
                                 {/* Add icons to the links using the .nav-icon class
          with font-awesome or any other icon font library */}
                                 <li className="nav-item menu-open">
-                                <Link to="/" className="nav-link active">
-                                    <i className="nav-icon fas fa-tachometer-alt" />
+                                    <Link to="/" className="nav-link active">
+                                        <i className="nav-icon fas fa-tachometer-alt" />
                                         <p>
-                                        Dashboard 
+                                            Dashboard
                                         </p>
                                     </Link>
-                                   
+
 
                                 </li>
                                 <li className="nav-item">
@@ -87,80 +88,21 @@ class Sidebar extends Component {
                                 </li>
                                 <li className="nav-item">
                                     <Link to="/admin/project-plan" className="nav-link">
-                                    <i className="nav-icon far fa-image" />
+                                        <i className="nav-icon far fa-image" />
                                         <p>
-                                            Add Project 
+                                            Add Project
                                         </p>
                                     </Link>
                                 </li>
                                 <li className="nav-item">
                                     <Link to="/admin/project-plan-list" className="nav-link">
-                                    <i className="nav-icon far fa-image" />
+                                        <i className="nav-icon far fa-image" />
                                         <p>
                                             Project Plan List
                                         </p>
                                     </Link>
                                 </li>
-                                {/* <li className="nav-item">
-                                    <a href="#/" className="nav-link">
-                                        <i className="nav-icon fas fa-copy" />
-                                        <p>
-                                            Layout Options
-                                            <i className="fas fa-angle-left right" />
-                                            <span className="badge badge-info right">6</span>
-                                        </p>
-                                    </a>
-                                    <ul className="nav nav-treeview">
-                                        <li className="nav-item">
-                                            <a href="pages/layout/top-nav.html" className="nav-link">
-                                                <i className="far fa-circle nav-icon" />
-                                                <p>Top Navigation</p>
-                                            </a>
-                                        </li>
-                                        <li className="nav-item">
-                                            <a href="pages/layout/top-nav-sidebar.html" className="nav-link">
-                                                <i className="far fa-circle nav-icon" />
-                                                <p>Top Navigation + Sidebar</p>
-                                            </a>
-                                        </li>
-                                        <li className="nav-item">
-                                            <a href="pages/layout/boxed.html" className="nav-link">
-                                                <i className="far fa-circle nav-icon" />
-                                                <p>Boxed</p>
-                                            </a>
-                                        </li>
-                                        <li className="nav-item">
-                                            <a href="pages/layout/fixed-sidebar.html" className="nav-link">
-                                                <i className="far fa-circle nav-icon" />
-                                                <p>Fixed Sidebar</p>
-                                            </a>
-                                        </li>
-                                        <li className="nav-item">
-                                            <a href="pages/layout/fixed-sidebar-custom.html" className="nav-link">
-                                                <i className="far fa-circle nav-icon" />
-                                                <p>Fixed Sidebar <small>+ Custom Area</small></p>
-                                            </a>
-                                        </li>
-                                        <li className="nav-item">
-                                            <a href="pages/layout/fixed-topnav.html" className="nav-link">
-                                                <i className="far fa-circle nav-icon" />
-                                                <p>Fixed Navbar</p>
-                                            </a>
-                                        </li>
-                                        <li className="nav-item">
-                                            <a href="pages/layout/fixed-footer.html" className="nav-link">
-                                                <i className="far fa-circle nav-icon" />
-                                                <p>Fixed Footer</p>
-                                            </a>
-                                        </li>
-                                        <li className="nav-item">
-                                            <a href="pages/layout/collapsed-sidebar.html" className="nav-link">
-                                                <i className="far fa-circle nav-icon" />
-                                                <p>Collapsed Sidebar</p>
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </li> */}
+                                
                             </ul>
                         </nav>
                         {/* /.sidebar-menu */}

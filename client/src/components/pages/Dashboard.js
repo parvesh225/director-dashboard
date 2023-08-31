@@ -38,7 +38,7 @@ class Dashboard extends Component {
                                             {/* <p>Director</p> */}
                                             <h4> C-Cube </h4>
                                         </div>
-                                        {/* <a href="#/" className="small-box-footer"><i className="bi bi-arrow-clockwise" /> Details More... </a> */}
+                                        <a href="#/" className="small-box-footer"><i className="bi bi-arrow-clockwise" /> Details More... </a>
                                     </div>
                                 </div>
 
@@ -71,7 +71,7 @@ class Dashboard extends Component {
                                             {/* <p>Director</p> */}
                                             <h4>CUEG</h4>
                                         </div>
-                                        {/* <a href="#/" className="small-box-footer"><i className="bi bi-stopwatch" />Details More...</a> */}
+                                        <a href="#/" className="small-box-footer"><i className="bi bi-stopwatch" />Details More...</a>
                                     </div>
                                 </div>
 

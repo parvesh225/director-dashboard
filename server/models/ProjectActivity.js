@@ -34,11 +34,11 @@ ProjectActivity.init({
      
     start_date: {
       type: DataTypes.DATE,
-      allowNull: false
+      allowNull: true
     },
     end_date: {
       type: DataTypes.DATE,
-      allowNull: false
+      allowNull: true
     },
     duration: {
       type: DataTypes.STRING,

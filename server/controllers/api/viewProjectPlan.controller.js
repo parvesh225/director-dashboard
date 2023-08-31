@@ -83,12 +83,12 @@ async function fundingDetail(req, res, next) {
     return res.status(200).json({
       status: true,
       financeList: finaceList,
-      totalReceivedAmt:receivedAmt[0].amount_recieved,
-      balanceAmt:receivedAmt[0].amount_recieved - utilizedAmt[0].expenditure,
+      totalReceivedAmt: receivedAmt[0].amount_recieved,
+      balanceAmt: receivedAmt[0].amount_recieved - utilizedAmt[0].expenditure,
       lastAmtReceived: data[0].amount_recieved,
       lastAmtDate: data[0].amount_recieved_date,
-      amountTillDate:amountTillDate[0].allocated_fund,
-      utilizedAmt:utilizedAmt[0].expenditure
+      amountTillDate: amountTillDate[0].allocated_fund,
+      utilizedAmt: utilizedAmt[0].expenditure
     })
   } catch (err) {
     return res.status(500).json({
@@ -100,7 +100,7 @@ async function fundingDetail(req, res, next) {
 
 }
 
-async function projectActivityGraph(req, res, next) { 
+async function projectActivityGraph(req, res, next) {
   try {
 
     let id = req.params.id;
@@ -111,7 +111,7 @@ async function projectActivityGraph(req, res, next) {
       where: { id: `${id}` }
     });
 
-    
+
 
     if (!project) {
       throw new Error("Project not found ");
@@ -127,43 +127,112 @@ async function projectActivityGraph(req, res, next) {
     var years = Array();
 
     for (i = startYear; i <= endYear; i++) years.push(i);
-
     // End Find Years List
+
     let whereObj = {
       project_plan_id: id
     }
-    if(year && year != 'All'){
+    if (year && year != 'All') {
       whereObj.year = year
     }
+
     let subCatagoryList = await ProjectActivity.findAll({
       where: whereObj
     });
+
     let customObj = [];
-    for (i = 0; i < subCatagoryList.length; i++){
-        var obj = subCatagoryList[i]
+    let customObj2 = [];
+    let customObj3 = [];
+    let customObj4 = [];
+    let customObj5 = [];
+
+    for (i = 0; i < subCatagoryList.length; i++) {
+      var obj = subCatagoryList[i];
+
+      // for Mou
+      if (obj.project_master_activity_id === 1) {
+        //get round figure value for series
+        let x = (obj.current_entries *100 )/ obj.expected_entries
         customObj.push({
           name: obj.project_master_activity_name,
           totalActivities: obj.expected_entries,
-          currentActivities: obj.current_entries
+          currentActivities: obj.current_entries,
+          series : [Math.trunc(x)],
+          label: "Activity ("+ obj.current_entries +"/"+ obj.expected_entries+")"
         })
+      }
+
+      // for Geographic Spread or Locations
+      if (obj.project_master_activity_id === 2) {
+        let x = (obj.current_entries *100 )/ obj.expected_entries
+        customObj2.push({
+          name: obj.project_master_activity_name,
+          totalActivities: obj.expected_entries,
+          currentActivities: obj.current_entries,
+          series : [Math.trunc(x)],
+          label: "Activity ("+ obj.current_entries +"/"+ obj.expected_entries+")"
+        })
+      }
+
+      // for Advocacy and Capacity Building
+      if (obj.project_master_activity_id === 3) {
+        let x = (obj.current_entries *100 )/ obj.expected_entries;
+        customObj3.push({
+          name: obj.project_master_activity_name,
+          totalActivities: obj.expected_entries,
+          currentActivities: obj.current_entries,
+          series : [Math.trunc(x)],
+          label: "Activity ("+ obj.current_entries +"/"+ obj.expected_entries+")"
+        })
+      }
+
+      // for Knowledge management
+      if (obj.project_master_activity_id === 4) {
+        let x = (obj.current_entries *100 )/ obj.expected_entries;
+        customObj4.push({
+          name: obj.project_master_activity_name,
+          totalActivities: obj.expected_entries,
+          currentActivities: obj.current_entries,
+          series : [Math.trunc(x)],
+          label: "Activity ("+ obj.current_entries +"/"+ obj.expected_entries+")"
+        })
+      }
+
+      // for Other (such as Prog/Proj devt: partnerships)
+      if (obj.project_master_activity_id === 5) {
+        let x = (obj.current_entries *100 )/ obj.expected_entries;
+        customObj5.push({
+          name: obj.project_master_activity_name,
+          totalActivities: obj.expected_entries,
+          currentActivities: obj.current_entries,
+          series : [Math.trunc(x)],
+          label: "Activity ("+ obj.current_entries +"/"+ obj.expected_entries+")"
+        })
+      }
+
     }
-    
+
     // Success Message Return
     return res.status(200).json({
       status: true,
       years: years,
-      projectActivity : customObj
+      projectActivity: customObj,
+      projectActivity2: customObj2,
+      projectActivity3: customObj3,
+      projectActivity4: customObj4,
+      projectActivity5: customObj5,
+
     });
 
 
-  }catch (error) {
+  } catch (error) {
     return res.status(501).json({
       status: false,
       message: error.message
     })
 
   }
- }
+}
 
 
 module.exports = {
