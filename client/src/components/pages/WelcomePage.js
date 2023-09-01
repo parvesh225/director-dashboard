@@ -4,13 +4,20 @@ import Header from "../layout/Header";
 import Sidebar from "../layout/Sidebar";
 import './WelcomePage.css';
 import Chart from "react-apexcharts";
+const axios = require("axios").default;
+
 
 class WelcomePage extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
-    
+      totalFunding: 0,
+      totalProject: 0,
+      totalEmployee: 0,
+      knowledgeProduct: 0,
+      totalMou: 0,
+
       series: [44, 55, 13, 43, 22],
       options: {
         chart: {
@@ -83,6 +90,18 @@ class WelcomePage extends Component {
     };
   }
 
+  // get api 
+  componentDidMount() {
+    // var thizz = this;
+
+    axios.get(process.env.REACT_APP_BASE_URL + "/api/landing-page" )
+      .then((response) => {
+        console.log(response.data);
+      }).catch((error) => {
+        console.log(error.response.data)
+      })
+      
+  }
 
   render() {
     return (
@@ -103,23 +122,23 @@ class WelcomePage extends Component {
               <div className="row text-center mt-4">
                 <div className="col-md-2">
                   <p className="p1">Total Fund</p>
-                  <p className="p2">10</p>
+                  <p className="p2"> { this.state.totalFunding } </p>
                 </div>
                 <div className="col-md-2">
                   <p className="p1">Total Project</p>
-                  <p className="p2">10</p>
+                  <p className="p2"> { this.state.totalProject } </p>
                 </div>
                 <div className="col-md-2">
                   <p className="p1">Total Employee</p>
-                  <p className="p2">10</p>
+                  <p className="p2"> { this.state.totalEmployee } </p>
                 </div>
                 <div className="col-md-2">
                   <p className="p1">Knowledge Products</p>
-                  <p className="p2">10</p>
+                  <p className="p2"> { this.state.knowledgeProduct } </p>
                 </div>
                 <div className="col-md-2">
                   <p className="p1">Total MOU</p>
-                  <p className="p2">10</p>
+                  <p className="p2"> { this.state.totalMou } </p>
                 </div>
               </div>
             </div>
@@ -130,7 +149,7 @@ class WelcomePage extends Component {
               <div className="icon">
                 <i className="fa fa-bar-chart faChart" aria-hidden="true"></i>
               </div>
-              <h4 className="header">Project Wise Funding</h4>
+              <h4 className="header"> Overall Fund</h4>
                 <Chart options={this.state.options} series={this.state.series} type="pie" width={500} />
             </div>
               </div>
@@ -139,7 +158,7 @@ class WelcomePage extends Component {
               <div className="icon">
                 <i className="fa fa-bar-chart faChart" aria-hidden="true"></i>
               </div>
-              <h4 className="header">Fund Details</h4>
+              <h4 className="header">Fund Utilization</h4>
                 <Chart options={this.state.options1} series={this.state.series1} type="bar" height={355} />
             </div>
               </div>

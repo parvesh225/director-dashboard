@@ -43,7 +43,7 @@ async function overallDashboard(req, res, next) {
    and pr.centre_name=${center} 
   `,
     { type: db.QueryTypes.SELECT });
-  console.log(utilizedAmt);
+  // console.log(utilizedAmt);
 
   var balance = 0.00
   if (receivedAmt && utilizedAmt) {
@@ -152,61 +152,61 @@ async function projectActivityGraph(req, res, next) {
       // for Mou
       if (obj.project_master_activity_id === 1) {
         //get round figure value for series
-        let x = (obj.current_entries *100 )/ obj.expected_entries
+        let x = (obj.current_entries * 100) / obj.expected_entries
         customObj.push({
           name: obj.project_master_activity_name,
           totalActivities: obj.expected_entries,
           currentActivities: obj.current_entries,
-          series : [Math.trunc(x)],
-          label: "Activity ("+ obj.current_entries +"/"+ obj.expected_entries+")"
+          series: [Math.trunc(x)],
+          label: "Activity (" + obj.current_entries + "/" + obj.expected_entries + ")"
         })
       }
 
       // for Geographic Spread or Locations
       if (obj.project_master_activity_id === 2) {
-        let x = (obj.current_entries *100 )/ obj.expected_entries
+        let x = (obj.current_entries * 100) / obj.expected_entries
         customObj2.push({
           name: obj.project_master_activity_name,
           totalActivities: obj.expected_entries,
           currentActivities: obj.current_entries,
-          series : [Math.trunc(x)],
-          label: "Activity ("+ obj.current_entries +"/"+ obj.expected_entries+")"
+          series: [Math.trunc(x)],
+          label: "Activity (" + obj.current_entries + "/" + obj.expected_entries + ")"
         })
       }
 
       // for Advocacy and Capacity Building
       if (obj.project_master_activity_id === 3) {
-        let x = (obj.current_entries *100 )/ obj.expected_entries;
+        let x = (obj.current_entries * 100) / obj.expected_entries;
         customObj3.push({
           name: obj.project_master_activity_name,
           totalActivities: obj.expected_entries,
           currentActivities: obj.current_entries,
-          series : [Math.trunc(x)],
-          label: "Activity ("+ obj.current_entries +"/"+ obj.expected_entries+")"
+          series: [Math.trunc(x)],
+          label: "Activity (" + obj.current_entries + "/" + obj.expected_entries + ")"
         })
       }
 
       // for Knowledge management
       if (obj.project_master_activity_id === 4) {
-        let x = (obj.current_entries *100 )/ obj.expected_entries;
+        let x = (obj.current_entries * 100) / obj.expected_entries;
         customObj4.push({
           name: obj.project_master_activity_name,
           totalActivities: obj.expected_entries,
           currentActivities: obj.current_entries,
-          series : [Math.trunc(x)],
-          label: "Activity ("+ obj.current_entries +"/"+ obj.expected_entries+")"
+          series: [Math.trunc(x)],
+          label: "Activity (" + obj.current_entries + "/" + obj.expected_entries + ")"
         })
       }
 
       // for Other (such as Prog/Proj devt: partnerships)
       if (obj.project_master_activity_id === 5) {
-        let x = (obj.current_entries *100 )/ obj.expected_entries;
+        let x = (obj.current_entries * 100) / obj.expected_entries;
         customObj5.push({
           name: obj.project_master_activity_name,
           totalActivities: obj.expected_entries,
           currentActivities: obj.current_entries,
-          series : [Math.trunc(x)],
-          label: "Activity ("+ obj.current_entries +"/"+ obj.expected_entries+")"
+          series: [Math.trunc(x)],
+          label: "Activity (" + obj.current_entries + "/" + obj.expected_entries + ")"
         })
       }
 
