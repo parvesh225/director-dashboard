@@ -118,7 +118,6 @@ class WelcomePage extends Component {
       }
         if (actualResp.FundingAgency) {
           let options = thizz.state.options;
-          options.labels = ["Ministry of Housing and Urban Affairs"];
           options.chart.id = `basic-bar${Math.random()}`;
           thizz.setState({ options: options })
       }
