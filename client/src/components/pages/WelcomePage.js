@@ -18,17 +18,20 @@ class WelcomePage extends Component {
       knowledgeProduct: 0,
       totalMou: 0,
 
-      series: [44, 55, 13, 43, 22],
+      // series: [44, 55, 13, 43, 22],
+      series:[],
       options: {
         chart: {
           width: 380,
           type: 'pie',
         },
-        labels: ['Team A', 'Team B', 'Team C', 'Team D', 'Team E'],
+        labels: [],
+        // labels: ['Team A', 'Team B', 'Team C', 'Team D', 'Team E'],
         responsive: [{
           breakpoint: 480,
           options: {
             chart: {
+              id: `basic-bar${Math.random()}`,
               width: 200
             },
             legend: {
@@ -92,11 +95,38 @@ class WelcomePage extends Component {
 
   // get api 
   componentDidMount() {
-    // var thizz = this;
+    var thizz = this;
 
     axios.get(process.env.REACT_APP_BASE_URL + "/api/landing-page" )
       .then((response) => {
         console.log(response.data);
+        var actualResp = response.data;
+        if (actualResp.totalFund) {
+          thizz.setState({ totalFunding: actualResp.totalFund })
+      }
+        if (actualResp.totalProject) {
+          thizz.setState({ totalProject: actualResp.totalProject })
+      }
+        if (actualResp.totalEmployee) {
+          thizz.setState({ totalEmployee: actualResp.totalEmployee })
+      }
+        if (actualResp.totalKnowledgeProducts) {
+          thizz.setState({ knowledgeProduct: actualResp.totalKnowledgeProducts })
+      }
+        if (actualResp.totalMou) {
+          thizz.setState({ totalMou: actualResp.totalMou })
+      }
+        if (actualResp.FundingAgency) {
+          let options = thizz.state.options;
+          options.labels = ["Ministry of Housing and Urban Affairs"];
+          options.chart.id = `basic-bar${Math.random()}`;
+          thizz.setState({ options: options })
+      }
+        if (actualResp.FundingAmt) {
+          thizz.setState({ series: actualResp.FundingAmt })
+      }
+
+      
       }).catch((error) => {
         console.log(error.response.data)
       })
