@@ -18,28 +18,9 @@ class WelcomePage extends Component {
       knowledgeProduct: 0,
       totalMou: 0,
 
-      // series: [44, 55, 13, 43, 22],
+      //series: [44, 55, 13, 43, 22],
       series:[],
-      options: {
-        chart: {
-          width: 380,
-          type: 'pie',
-        },
-        labels: [],
-        // labels: ['Team A', 'Team B', 'Team C', 'Team D', 'Team E'],
-        responsive: [{
-          breakpoint: 480,
-          options: {
-            chart: {
-              id: `basic-bar${Math.random()}`,
-              width: 200
-            },
-            legend: {
-              position: 'bottom'
-            }
-          }
-        }]
-      },
+      options: {},
     
       series1: [{
         name: 'Net Profit',
@@ -117,9 +98,25 @@ class WelcomePage extends Component {
           thizz.setState({ totalMou: actualResp.totalMou })
       }
         if (actualResp.FundingAgency) {
-          let options = thizz.state.options;
-          options.chart.id = `basic-bar${Math.random()}`;
-          thizz.setState({ options: options })
+          let newOptions = {
+            chart: {
+              width: 380,
+              type: 'pie',
+            },
+            labels: actualResp.FundingAgency,
+            responsive: [{
+              breakpoint: 480,
+              options: {
+                chart: {
+                  width: 200
+                },
+                legend: {
+                  position: 'bottom'
+                }
+              }
+            }]
+          }
+          thizz.setState({ options: newOptions })
       }
         if (actualResp.FundingAmt) {
           thizz.setState({ series: actualResp.FundingAmt })

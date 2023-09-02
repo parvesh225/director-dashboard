@@ -38,7 +38,7 @@ async function overView(req, res, next) {
       }
     });
       // Get all funding details for pie graph
-    const FundingAgancyDetails = await db.query(`SELECT * FROM project_plan INNER JOIN funding_agency ON project_plan.funding_agency = funding_agency.agency_code`,
+    const FundingAgancyDetails = await db.query(`SELECT * FROM project_plan as pp left JOIN funding_agency as fa ON pp.funding_agency = fa.agency_code`,
     { type: db.QueryTypes.SELECT });
 
     
