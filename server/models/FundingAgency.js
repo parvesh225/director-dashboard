@@ -23,7 +23,7 @@ FundingAgency.init({
     // Other model options go here
     sequelize : db, // We need to pass the connection instance
     modelName: 'FundingAgency' ,// We need to choose the model name
-    tableName: 'funding-agency',
+    tableName: 'funding_agency',
     createdAt: "created_at",
     updatedAt: "updated_at",
     underscored:true

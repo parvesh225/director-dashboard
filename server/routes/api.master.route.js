@@ -6,6 +6,7 @@ const projectController = require('../controllers/api/project.controller');
 const teamleaderController = require('../controllers/api/teamleader.controller');
 const projectPlanController = require('../controllers/api/projectPlan.controller');
 const overallDashboardController = require('../controllers/api/viewProjectPlan.controller');
+const welcomePageController = require('../controllers/api/welcome.controller');
 
 // Centre Route
 router.post('/admin/centre', centreController.insert);
@@ -58,6 +59,7 @@ router.post('/admin/fetch-finances-by-year-project',projectPlanController.savePr
 
 
 //Frontend
+router.get('/landing-page', welcomePageController.overView);
 router.get('/admin/overall-dashboard/:id',overallDashboardController.overallDashboard);
 router.get('/project-activity-graph/:id/:year?',overallDashboardController.projectActivityGraph);
 router.get('/admin/project-finance-details/:id',overallDashboardController.fundingDetail);
