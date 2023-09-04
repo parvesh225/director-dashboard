@@ -1,8 +1,22 @@
 .headingLine {
   font-size: 32px;
-  text-align: center;
   font-family: "Roboto Condensed";
+  margin-left: 15px;
 }
+.filterButton {
+  float: right;
+  width: 350px;
+}
+.myContainer {
+  display: flex;
+  padding: 5px;
+}
+
+.select-box {
+  flex: 1; /* Distribute equal width to both select boxes */
+  margin-right: 10px; /* Optional spacing between select boxes */
+}
+
 .fa-bar-chart {
   font-size: xx-large;
   /* background-color: brown; */
@@ -56,4 +70,6 @@
 .icon i {
   color: #0088E8;
 }
-
+.setGraph {
+  margin-left: -58px;
+}
