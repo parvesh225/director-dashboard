@@ -38,7 +38,7 @@ class WelcomePage extends Component {
       series1: [],
       options1: {},
 
-    // for second row graph
+      // for second row graph
       series2Row: [],
       options2Row: {
         chart: {
@@ -105,7 +105,7 @@ class WelcomePage extends Component {
           },
         },
         labels: ['Knowledge'],
-        colors: ['#208293'] 
+        colors: ['#208293']
       },
 
       series25Row: [],
@@ -122,6 +122,51 @@ class WelcomePage extends Component {
           },
         },
         labels: ['Other'],
+      },
+
+      series3Row: [{
+        data: [21, 22, 10, 28, 16, 5, 8]
+      }],
+      options3Row: {
+        chart: {
+          height: 350,
+          type: 'bar',
+          events: {
+            click: function(chart, w, e) {
+              // console.log(chart, w, e)
+            }
+          }
+        },
+        // colors: colors,
+        plotOptions: {
+          bar: {
+            columnWidth: '45%',
+            distributed: true,
+          }
+        },
+        dataLabels: {
+          enabled: false
+        },
+        legend: {
+          show: false
+        },
+        xaxis: {
+          categories: [
+            ['Account', 'Department'],
+            ['Information', 'Technology'],
+            ['Marketing', 'Department'],
+            ['Customer', 'Success'],
+            'Finance',
+            'R&D',
+            'Sales',
+          ],
+          labels: {
+            style: {
+              // colors: colors,
+              fontSize: '12px'
+            }
+          }
+        }
       },
 
     };
@@ -324,6 +369,23 @@ class WelcomePage extends Component {
               <span className="headingLine"> DIRECTOR NIUA DASHBOARD  </span>
               <span className="filterButton">
                 <div className="myContainer">
+
+                  <select
+                    className="form-control select-box"
+                    name="centre_name"
+                    id="centre_name"
+                  // onChange={this.handleChange}
+                  >
+                    <option> Year </option>
+                    <option> All Year</option>
+                    <option value="2020">2020</option>
+                    <option value="2021">2021</option>
+                    <option value="2022">2022</option>
+                    <option value="2023">2023</option>
+                    <option value="2024">2024</option>
+                    <option value="2025">2025</option>
+                  </select>
+
                   <select
                     className="form-control select-box"
                     name="centre_name"
@@ -378,13 +440,21 @@ class WelcomePage extends Component {
               </div>
             </div>
 
-            <div className="row">
+            <div className="row ">
+              <div className="col-md-12 mb-1">
+                <button className="btn btn-dark border-dark ml-4  mr-2 p-2"> Summary </button>
+                <button className="btn border-dark mr-2 p-2"> Budget Head
+                </button>
+                <button className="btn border-dark mr-2 p-2"> Invoice </button>
+                <button className="btn border-dark mr-2 p-2"> Deficits </button>
+              </div>
+
               <div className="col-md-6">
                 <div className="header-container card">
                   <div className="icon">
                     <i className="fa fa-bar-chart faChart" aria-hidden="true"></i>
                   </div>
-                  <h4 className="header"> Overall Fund</h4> <span style={{float:"right", marginTop:"10px"}}> <input type="checkbox" /> <lable> Project Wise Funding</lable> </span>
+                  <h4 className="header"> Overall Fund</h4> <span style={{ float: "right", marginTop: "10px" }}> <input type="checkbox" /> <lable> Project Wise Funding</lable> </span>
                   <Chart options={this.state.options} series={this.state.series} type="pie" style={{ height: "315px" }} />
                 </div>
               </div>
@@ -399,70 +469,91 @@ class WelcomePage extends Component {
               </div>
             </div>
 
+            <h2 className="bg-info mb-3" style={{ textAlign: "center" }}> Finances </h2>
 
-            <div className="row text-center p-2">
-                      <div className="col-md-2 card bg-primary">
 
-                        <p style={{ marginTop: "70px" }}> Progress </p>
-                        <p style={{ marginTop: "100px" }}> Activity </p>
-                      </div>
 
-                      <div className="col-md-2 card">
-                        <Chart
-                         options={this.state.options2Row} series={this.state.series2Row}
-                          type="radialBar"
-                          height={200}
-                        />
-                        <p className="mb-5">  {this.state.catagoryName2Row} </p> 
-                        <br/>
-                        <p className="p-1" style={{backgroundColor:"#FFA556", color:"white"}}> {this.state.activity2Row}</p>
-                      </div>
+            <div className="row p-2">
+            <div className="col-md-12 mb-1">
+                <button className="btn  border-dark ml-4  mr-2 p-2"> Summary </button>
+                <button className="btn border-dark  btn-dark mr-2 p-2"> Sector wise
 
-                      <div className="col-md-2 card">
-                        <Chart
-                         options={this.state.options22Row} series={this.state.series22Row}
-                          type="radialBar"
-                          height={200}
-                        />
-                        <p className="mb-4">  {this.state.catagoryName22Row} </p> 
-                        <br/>
-                        <p className="p-1" style={{backgroundColor:"#AC86D1", color:"white"}}> {this.state.activity22Row}</p>
-                      </div>
-                      <div className="col-md-2 card">
-                        <Chart
-                         options={this.state.options23Row} series={this.state.series23Row}
-                          type="radialBar"
-                          height={200}
-                        />
-                        <p className="mb-4"> {this.state.catagoryName23Row} </p>
-                        <br/>
-                        <p className="p-1" style={{backgroundColor:"#9BEA81", color:"white"}}> {this.state.activity23Row}</p>
-                      </div>
-                      <div className="col-md-2 card">
-                        <Chart
-                         options={this.state.options24Row} series={this.state.series24Row}
-                          type="radialBar"
-                          height={200}
-                        />
-                        <p className="mb-4">  {this.state.catagoryName24Row}  </p>
-                        <br/>
-                        <p className="p-1" style={{backgroundColor:"#208293", color:"white"}}> {this.state.activity24Row}</p>
-                      </div>
-                      <div className="col-md-2 card">
-                        <Chart
-                         options={this.state.options25Row} series={this.state.series25Row}
-                          type="radialBar"
-                          height={200}
-                        />
-                        <p className="mb-4">   {this.state.catagoryName25Row}  </p>
-                        <p className="p-1 bg-primary"> {this.state.activity25Row}</p>
-                      </div>
-                </div>
+                </button>
+                <button className="btn border-dark mr-2 p-2"> MoUs </button>
+              </div>
 
-                
+              <div className="col-md-2 card bg-primary text-center ">
+
+                <p style={{ marginTop: "70px" }}> Progress </p>
+                <p style={{ marginTop: "100px" }}> Activity </p>
+              </div>
+
+              <div className="col-md-2 card">
+                <Chart
+                  options={this.state.options2Row} series={this.state.series2Row}
+                  type="radialBar"
+                  height={200}
+                />
+                <p className="mb-5">  {this.state.catagoryName2Row} </p>
+                <br />
+                <p className="p-1" style={{ backgroundColor: "#FFA556", color: "white" }}> {this.state.activity2Row}</p>
+              </div>
+
+              <div className="col-md-2 card">
+                <Chart
+                  options={this.state.options22Row} series={this.state.series22Row}
+                  type="radialBar"
+                  height={200}
+                />
+                <p className="mb-4">  {this.state.catagoryName22Row} </p>
+                <br />
+                <p className="p-1" style={{ backgroundColor: "#AC86D1", color: "white" }}> {this.state.activity22Row}</p>
+              </div>
+              <div className="col-md-2 card">
+                <Chart
+                  options={this.state.options23Row} series={this.state.series23Row}
+                  type="radialBar"
+                  height={200}
+                />
+                <p className="mb-4"> {this.state.catagoryName23Row} </p>
+                <br />
+                <p className="p-1" style={{ backgroundColor: "#9BEA81", color: "white" }}> {this.state.activity23Row}</p>
+              </div>
+              <div className="col-md-2 card">
+                <Chart
+                  options={this.state.options24Row} series={this.state.series24Row}
+                  type="radialBar"
+                  height={200}
+                />
+                <p className="mb-4">  {this.state.catagoryName24Row}  </p>
+                <br />
+                <p className="p-1" style={{ backgroundColor: "#208293", color: "white" }}> {this.state.activity24Row}</p>
+              </div>
+              <div className="col-md-2 card">
+                <Chart
+                  options={this.state.options25Row} series={this.state.series25Row}
+                  type="radialBar"
+                  height={200}
+                />
+                <p className="mb-4">   {this.state.catagoryName25Row}  </p>
+                <p className="p-1 bg-primary"> {this.state.activity25Row}</p>
+              </div>
+            </div>
+            <h2 className="bg-info  mb-5" style={{ textAlign: "center" }}> Project Activity </h2>
+
+          <div className="row">
+            <div className="col-md-12">
+            <div className="row card text-center">
+          <Chart options={this.state.options3Row} series={this.state.series3Row} type="bar" width={800} height={300}/>
+          </div>
+            </div>
+          </div>
+            <h2 className="bg-info" style={{ textAlign: "center" }}> HR </h2>
+
 
             {/* </div> */}
-          </section>  
+          </section>
+          
         </div>
         <Footer />
       </>
