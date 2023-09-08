@@ -23,8 +23,11 @@ class WelcomePage extends Component {
     this.state = {
       centre: [],
       project: [],
-      centre_name: "",
-      project_name: "",
+      filterData: {
+        centre_name: "",
+        project_name: "",
+        year:"",
+      },
       totalFunding: 0,
       totalProject: 0,
       totalEmployee: 0,
@@ -170,182 +173,211 @@ class WelcomePage extends Component {
       },
 
     };
+    this.handleChange = this.handleChange.bind(this);
+    this.reloadDashboard = this.reloadDashboard.bind(this);
+
   }
 
+   // set state year, all center, all Project
+   handleChange(e) {
+    let filterData = this.state.filterData;
+    filterData[e.target.name] = e.target.value;
+    this.setState({ filterData: filterData });
+  }
+
+
+  reloadDashboard() {
+  
+    if(!this.state.filterData.year && !this.state.filterData.centre_name && !this.state.filterData.project_name) {
+      alert("One of the filter parameter is required");
+      return
+    }
+
+    this.dashboard(this);
+
+  }
   // get api 
   componentDidMount() {
     var thizz = this;
+    this.dashboard(thizz);
 
-    axios.get(process.env.REACT_APP_BASE_URL + "/api/landing-page")
-      .then((response) => {
-        console.log(response.data);
+  }
 
-        var centre = response.data.centres
-        var project = response.data.projects
+  dashboard(thizz) {
+    // axios.post(process.env.REACT_APP_BASE_URL + "/api/landing-page")
+    axios({
+      method: "post",
+      url: process.env.REACT_APP_BASE_URL + "/api/landing-page",
+      data: thizz.state.filterData
+    })
+    .then((response) => {
+      console.log(response.data);
 
-        this.setState({
-          centre: centre,
-          project: project
-        })
+      var centre = response.data.centres
+      var project = response.data.projects
 
-        var actualResp = response.data;
-        if (actualResp.totalFund) {
-          thizz.setState({ totalFunding: actualResp.totalFund })
-        }
-        if (actualResp.totalProject) {
-          thizz.setState({ totalProject: actualResp.totalProject })
-        }
-        if (actualResp.totalEmployee) {
-          thizz.setState({ totalEmployee: actualResp.totalEmployee })
-        }
-        if (actualResp.totalKnowledgeProducts) {
-          thizz.setState({ knowledgeProduct: actualResp.totalKnowledgeProducts })
-        }
-        if (actualResp.totalMou) {
-          thizz.setState({ totalMou: actualResp.totalMou })
-        }
-        if (actualResp.FundingAgency) {
-          let newOptions = {
-            chart: {
-              width: 380,
-              type: 'pie',
-            },
-            labels: actualResp.FundingAgency,
-            responsive: [{
-              breakpoint: 480,
-              options: {
-                chart: {
-                  width: 200,
-                },
-                legend: {
-                  position: 'bottom'
-                }
-              }
-            }]
-          }
-          thizz.setState({ options: newOptions })
-        }
-        if (actualResp.FundingAmt) {
-          thizz.setState({ series: actualResp.FundingAmt })
-        }
+      this.setState({
+        centre: centre,
+        project: project
+      })
 
-        if (actualResp.sanctionFund && actualResp.releasedFund && actualResp.utilizationFund) {
-          let newSeries = [{
-            name: 'Sanction Fund',
-            data: actualResp.sanctionFund
-          }, {
-            name: 'Released Fund',
-            data: actualResp.releasedFund
-          }, {
-            name: 'Utilization Fund',
-            data: actualResp.utilizationFund
-          }];
-          thizz.setState({ series1: newSeries })
-        }
-
-        if (actualResp.projectList) {
-          let secondOpt = {
-            chart: {
-              type: 'bar',
-              height: 350
-            },
-            plotOptions: {
-              bar: {
-                horizontal: true,
-                columnWidth: '55%',
-                endingShape: 'rounded'
+      var actualResp = response.data;
+      if (actualResp.totalFund !== null) {
+        thizz.setState({ totalFunding: actualResp.totalFund })
+      }
+      if (actualResp.totalProject !== null) {
+        thizz.setState({ totalProject: actualResp.totalProject })
+      }
+      if (actualResp.totalEmployee !== null) {
+        thizz.setState({ totalEmployee: actualResp.totalEmployee })
+      }
+      if (actualResp.totalKnowledgeProducts !== null) {
+        thizz.setState({ knowledgeProduct: actualResp.totalKnowledgeProducts })
+      }
+      if (actualResp.totalMou !== null) {
+        thizz.setState({ totalMou: actualResp.totalMou })
+      }
+      if (actualResp.FundingAgency) {
+        let newOptions = {
+          chart: {
+            width: 380,
+            type: 'pie',
+          },
+          labels: actualResp.FundingAgency,
+          responsive: [{
+            breakpoint: 480,
+            options: {
+              chart: {
+                width: 200,
               },
-            },
-            dataLabels: {
-              enabled: false
-            },
-            stroke: {
-              show: true,
-              width: 2,
-              colors: ['transparent']
-            },
-            xaxis: {
-              categories: actualResp.projectList,
-            },
-            yaxis: {
-              title: {
-                text: "In crores"
+              legend: {
+                position: 'bottom'
               }
+            }
+          }]
+        }
+        thizz.setState({ options: newOptions })
+      }
+      if (actualResp.FundingAmt) {
+        thizz.setState({ series: actualResp.FundingAmt })
+      }
+
+      if (actualResp.sanctionFund && actualResp.releasedFund && actualResp.utilizationFund) {
+        let newSeries = [{
+          name: 'Sanction Fund',
+          data: actualResp.sanctionFund
+        }, {
+          name: 'Released Fund',
+          data: actualResp.releasedFund
+        }, {
+          name: 'Utilization Fund',
+          data: actualResp.utilizationFund
+        }];
+        thizz.setState({ series1: newSeries })
+      }
+
+      if (actualResp.projectList) {
+        let secondOpt = {
+          chart: {
+            type: 'bar',
+            height: 350
+          },
+          plotOptions: {
+            bar: {
+              horizontal: true,
+              columnWidth: '55%',
+              endingShape: 'rounded'
             },
-            fill: {
-              opacity: 1
-            },
-            tooltip: {
-              y: {
-                formatter: function (val) {
-                  return "&#x20B9; " + val + " crores"
-                }
+          },
+          dataLabels: {
+            enabled: false
+          },
+          stroke: {
+            show: true,
+            width: 2,
+            colors: ['transparent']
+          },
+          xaxis: {
+            categories: actualResp.projectList,
+          },
+          yaxis: {
+            title: {
+              text: "In crores"
+            }
+          },
+          fill: {
+            opacity: 1
+          },
+          tooltip: {
+            y: {
+              formatter: function (val) {
+                return "&#x20B9; " + val + " crores"
               }
             }
           }
-          thizz.setState({ options1: secondOpt })
         }
+        thizz.setState({ options1: secondOpt })
+      }
 
-        var series2Row = thizz.state.series2Row;
-        series2Row = response.data.projectActivity[0].series;
+      var series2Row = thizz.state.series2Row;
+      series2Row = response.data.projectActivity[0].series;
 
-        var catagoryName2Row = thizz.state.catagoryName2Row;
-        catagoryName2Row = response.data.projectActivity[0].name;
-        var activity2Row = thizz.state.activity2Row;
-        activity2Row = response.data.projectActivity[0].label
+      var catagoryName2Row = thizz.state.catagoryName2Row;
+      catagoryName2Row = response.data.projectActivity[0].name;
+      var activity2Row = thizz.state.activity2Row;
+      activity2Row = response.data.projectActivity[0].label
 
-        var series22Row = thizz.state.series22Row;
-        series22Row = response.data.projectActivity2[0].series;
-        var catagoryName22Row = thizz.state.catagoryName22Row;
-        catagoryName22Row = response.data.projectActivity2[0].name;
-        var activity22Row = thizz.state.activity22Row;
-        activity22Row = response.data.projectActivity2[0].label
+      var series22Row = thizz.state.series22Row;
+      series22Row = response.data.projectActivity2[0].series;
+      var catagoryName22Row = thizz.state.catagoryName22Row;
+      catagoryName22Row = response.data.projectActivity2[0].name;
+      var activity22Row = thizz.state.activity22Row;
+      activity22Row = response.data.projectActivity2[0].label
 
-        var series23Row = thizz.state.series23Row;
-        series23Row = response.data.projectActivity3[0].series;
-        var catagoryName23Row = thizz.state.catagoryName23Row;
-        catagoryName23Row = response.data.projectActivity3[0].name;
-        var activity23Row = thizz.state.activity23Row;
-        activity23Row = response.data.projectActivity3[0].label
+      var series23Row = thizz.state.series23Row;
+      series23Row = response.data.projectActivity3[0].series;
+      var catagoryName23Row = thizz.state.catagoryName23Row;
+      catagoryName23Row = response.data.projectActivity3[0].name;
+      var activity23Row = thizz.state.activity23Row;
+      activity23Row = response.data.projectActivity3[0].label
 
-        var series24Row = thizz.state.series24Row;
-        series24Row = response.data.projectActivity4[0].series;
-        var catagoryName24Row = thizz.state.catagoryName24Row;
-        catagoryName24Row = response.data.projectActivity4[0].name;
-        var activity24Row = thizz.state.activity24Row;
-        activity24Row = response.data.projectActivity4[0].label
+      var series24Row = thizz.state.series24Row;
+      series24Row = response.data.projectActivity4[0].series;
+      var catagoryName24Row = thizz.state.catagoryName24Row;
+      catagoryName24Row = response.data.projectActivity4[0].name;
+      var activity24Row = thizz.state.activity24Row;
+      activity24Row = response.data.projectActivity4[0].label
 
-        var series25Row = thizz.state.series25Row;
-        series25Row = response.data.projectActivity5[0].series;
-        var catagoryName25Row = thizz.state.catagoryName25Row;
-        catagoryName25Row = response.data.projectActivity5[0].name;
-        var activity25Row = thizz.state.activity25Row;
-        activity25Row = response.data.projectActivity5[0].label
+      var series25Row = thizz.state.series25Row;
+      series25Row = response.data.projectActivity5[0].series;
+      var catagoryName25Row = thizz.state.catagoryName25Row;
+      catagoryName25Row = response.data.projectActivity5[0].name;
+      var activity25Row = thizz.state.activity25Row;
+      activity25Row = response.data.projectActivity5[0].label
 
-        thizz.setState({
-          series2Row: series2Row,
-          catagoryName2Row: catagoryName2Row,
-          activity2Row: activity2Row,
-          series22Row: series22Row,
-          catagoryName22Row: catagoryName22Row,
-          activity22Row: activity22Row,
-          series23Row: series23Row,
-          catagoryName23Row: catagoryName23Row,
-          activity23Row: activity23Row,
-          series24Row: series24Row,
-          catagoryName24Row: catagoryName24Row,
-          activity24Row: activity24Row,
-          series25Row: series25Row,
-          catagoryName25Row: catagoryName25Row,
-          activity25Row: activity25Row,
+      thizz.setState({
+        series2Row: series2Row,
+        catagoryName2Row: catagoryName2Row,
+        activity2Row: activity2Row,
+        series22Row: series22Row,
+        catagoryName22Row: catagoryName22Row,
+        activity22Row: activity22Row,
+        series23Row: series23Row,
+        catagoryName23Row: catagoryName23Row,
+        activity23Row: activity23Row,
+        series24Row: series24Row,
+        catagoryName24Row: catagoryName24Row,
+        activity24Row: activity24Row,
+        series25Row: series25Row,
+        catagoryName25Row: catagoryName25Row,
+        activity25Row: activity25Row,
 
-        });
+      });
 
 
-      }).catch((error) => {
-        console.log(error.response.data)
-      })
-
+    }).catch((error) => {
+      console.log(error.response.data)
+    })
   }
 
   render() {
@@ -372,9 +404,9 @@ class WelcomePage extends Component {
 
                   <select
                     className="form-control select-box"
-                    name="centre_name"
-                    id="centre_name"
-                  // onChange={this.handleChange}
+                    name="year"
+                    id="year"
+                    onChange={this.handleChange}
                   >
                     <option> Year </option>
                     <option> All Year</option>
@@ -384,6 +416,7 @@ class WelcomePage extends Component {
                     <option value="2023">2023</option>
                     <option value="2024">2024</option>
                     <option value="2025">2025</option>
+                    <option value="2030">2030</option>
                   </select>
 
                   <select
@@ -391,7 +424,7 @@ class WelcomePage extends Component {
                     name="centre_name"
                     id="centre_name"
                     value={this.state.centre_name}
-                  // onChange={this.handleChange}
+                    onChange={this.handleChange}
                   >
                     <option> All Centers </option>
                     {centre}
@@ -402,11 +435,15 @@ class WelcomePage extends Component {
                     name="project_name"
                     id="project_name"
                     value={this.state.project_name}
-                  // onChange={this.handleChange}
+                  onChange={this.handleChange}
                   >
-                    <option selected="selected"> All Projects </option>
+                    <option> All Projects </option>
                     {project}
                   </select>
+                  <button className="btn btn-sm btn-primary" onClick={this.reloadDashboard}>
+                  <i className="fa fa-refresh" aria-hidden="true"></i>
+
+                  </button>
                 </div>
               </span>
             </div>

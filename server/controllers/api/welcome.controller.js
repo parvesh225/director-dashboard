@@ -5,6 +5,8 @@ const { Centre } = require("../../models/Centre");
 const { Project } = require("../../models/Project");
 const { ProjectActivity } = require("../../models/ProjectActivity");
 const { db } = require("../../utils/db.utill");
+const { Op } = require('sequelize');
+const { ProjectMasterActivity } = require("../../models/ProjectMasterActivity");
 
 
 function formatNumberToCrores(number) {
@@ -32,28 +34,159 @@ async function overView(req, res, next) {
     let customObj4 = [];
     let customObj5 = [];
 
+
     const centres = await Centre.findAll();
     const projects = await Project.findAll();
 
-    let totalAllocatedBudget = await ProjectPlan.sum('allocated_budget');
-    let totalProject = await ProjectPlan.count({
-      distinct: true, // Use the DISTINCT keyword
-      col: 'project_name', // Specify the column to count distinct values for
-    });
+    let budgetWhereCondition = {};
+    /*if(req.body.year) {
+      budgetWhereCondition.start_date = {
+        [Op.gte] : new Date(req.body.year+'-04-01')
+      };
+      budgetWhereCondition.end_date = {
+        [Op.lte]: new Date((parseInt(req.body.year)+1)+'-03-31')
+     };
+    }*/
 
-    let totalEmployee = await Team.count({
-      distinct: true,
-      col: 'employee_name'
-    });
+    if (req.body.centre_name) {
+      budgetWhereCondition.centre_name = req.body.centre_name
+    }
 
+    if (req.body.project_name) {
+      budgetWhereCondition.project_name = req.body.project_name
+    }
 
-    let totalKnowledgeProducts = await ProjectActivityTask.count({
-      distinct: true,
-      col: 'task',
-      where: {
-        project_activity_id: 31,
+    let totalAllocatedBudget = 0;
+    if (Object.keys(budgetWhereCondition).length === 0) {
+      totalAllocatedBudget = await ProjectPlan.sum('allocated_budget');
+    } else {
+      totalAllocatedBudget = await ProjectPlan.sum('allocated_budget', {
+        where: budgetWhereCondition
+      });
+    }
+    if (!totalAllocatedBudget) {
+      totalAllocatedBudget = 0;
+    }
+
+    let totalProjectCountWhere = {}
+    if (req.body.centre_name) {
+      totalProjectCountWhere.centre_name = req.body.centre_name
+    }
+
+    if (req.body.project_name) {
+      totalProjectCountWhere.project_name = req.body.project_name
+    }
+
+    let totalProject = 0;
+    if (Object.keys(totalProjectCountWhere).length === 0) {
+      totalProject = await ProjectPlan.count({
+        distinct: true, // Use the DISTINCT keyword
+        col: 'project_name', // Specify the column to count distinct values for
+      })
+    } else {
+      totalProject = await ProjectPlan.count({
+        distinct: true, // Use the DISTINCT keyword
+        col: 'project_name', // Specify the column to count distinct values for
+        where: totalProjectCountWhere
+      });
+    }
+    if (!totalProject) {
+      totalProject = 0;
+    }
+
+    let whereOfTeam = {}
+    if (req.body.centre_name) {
+      whereOfTeam.centre_name = req.body.centre_name
+    }
+
+    if (req.body.project_name) {
+      whereOfTeam.project_name = req.body.project_name
+    }
+    let totalEmployee = 0
+    if (Object.keys(whereOfTeam).length === 0) {
+      let customObj = await db.query(`SELECT count(t.id) as cnt FROM teams as t
+      inner JOIN project_plan as pp
+      ON t.project_plan_id = pp.id where employee_name is not null`,
+        { type: db.QueryTypes.SELECT });
+      if (customObj) {
+        totalEmployee = customObj[0].cnt
       }
-    });
+    } else {
+      var whereString = 'where employee_name is not null';
+      if (whereOfTeam.centre_name) {
+        whereString += ' and pp.centre_name =' + whereOfTeam.centre_name
+      }
+      if (whereOfTeam.project_name) {
+        whereString += ' and pp.project_name =' + whereOfTeam.project_name
+      }
+
+      let customObj = await db.query(`SELECT count(t.id) as cnt FROM teams as t
+      inner JOIN project_plan as pp
+      ON t.project_plan_id = pp.id ${whereString}`,
+        { type: db.QueryTypes.SELECT });
+        
+      if (customObj) {
+        totalEmployee = customObj[0].cnt
+      }
+    }
+
+
+    if (!totalEmployee) {
+      totalEmployee = 0
+    }
+    // let totalKnowledgeProducts = await ProjectActivityTask.count({
+    //   distinct: true,
+    //   col: 'task',
+    //   where: {
+    //     project_activity_id: 31,
+    //   }
+    // });
+
+    let whereOfProjectActivityTask = {}
+    if (req.body.centre_name) {
+      whereOfProjectActivityTask.centre_name = req.body.centre_name
+    }
+
+    if (req.body.project_name) {
+      whereOfProjectActivityTask.project_name = req.body.project_name
+    }
+    let totalKnowledgeProducts = 0;
+    let knowledgeProduct = await ProjectMasterActivity.findOne({
+      where: {
+        name: 'Knowledge management'
+      }
+    })
+    if (Object.keys(whereOfProjectActivityTask).length === 0) {
+      let customObj = await db.query(`SELECT count(t.id) as cnt FROM project_activity_tasks  as t
+      inner JOIN project_activity as pa on pa.id=t.project_activity_id
+      inner JOIN project_plan as pp
+      ON t.project_plan_id = pp.id where pa.project_master_activity_id = ${knowledgeProduct.id}`,
+        { type: db.QueryTypes.SELECT });
+      if (customObj) {
+        totalKnowledgeProducts = customObj[0].cnt
+      }
+    } else {
+      var whereString = 'where pa.project_master_activity_id =  ' + knowledgeProduct.id + ' ';
+      if (whereOfProjectActivityTask.centre_name) {
+        whereString += ' and pp.centre_name =' + whereOfProjectActivityTask.centre_name
+      }
+      if (whereOfProjectActivityTask.project_name) {
+        whereString += ' and pp.project_name =' + whereOfProjectActivityTask.centre_name
+      }
+      let customObj = await db.query(`SELECT count(t.id) as cnt FROM project_activity_tasks as t
+      inner JOIN project_activity as pa on pa.id=t.project_activity_id
+      inner JOIN project_plan as pp
+      ON t.project_plan_id = pp.id ${whereString}`,
+        { type: db.QueryTypes.SELECT });
+      if (customObj) {
+        totalKnowledgeProducts = customObj[0].cnt
+      }
+    }
+
+
+    if (!totalKnowledgeProducts) {
+      totalKnowledgeProducts = 0
+    }
 
     let totalMou = await ProjectActivityTask.count({
       distinct: true,
@@ -62,6 +195,7 @@ async function overView(req, res, next) {
         project_activity_id: 28,
       }
     });
+
     // Get all funding details for pie graph
     const FundingAgancyDetails = await db.query(`SELECT * FROM project_plan as pp left JOIN funding_agency as fa ON pp.funding_agency = fa.agency_code`,
       { type: db.QueryTypes.SELECT });
@@ -82,8 +216,8 @@ async function overView(req, res, next) {
       for (let j = 0; j < sanction_releasedFund.length; j++) {
         let fund = sanction_releasedFund[j];
         // number formetted in crores
-         let s = formatNumberToCrores(fund.allocated_budget);
-          let r = formatNumberToCrores(fund.released_amt);
+        let s = formatNumberToCrores(fund.allocated_budget);
+        let r = formatNumberToCrores(fund.released_amt);
 
         sanctionFund.push(s);
         releasedFund.push(r);
@@ -121,8 +255,8 @@ async function overView(req, res, next) {
         })
       }
 
-       // for Geographic Spread or Locations
-       if (obj.project_master_activity_id === 2) {
+      // for Geographic Spread or Locations
+      if (obj.project_master_activity_id === 2) {
         let x = (obj.current_entries * 100) / obj.expected_entries
         customObj2.push({
           name: obj.project_master_activity_name,
@@ -187,7 +321,7 @@ async function overView(req, res, next) {
       "releasedFund": releasedFund,
       "utilizationFund": utilizationFund,
       //2nd row graph
-      "projectActivity":customObj,
+      "projectActivity": customObj,
       "projectActivity2": customObj2,
       "projectActivity3": customObj3,
       "projectActivity4": customObj4,
