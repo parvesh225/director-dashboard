@@ -4,6 +4,7 @@ import Header from "../layout/Header";
 import Sidebar from "../layout/Sidebar";
 import './WelcomePage.css';
 import Chart from "react-apexcharts";
+import moment from 'moment';
 import {
   BarChart,
   Bar,
@@ -28,11 +29,20 @@ class WelcomePage extends Component {
         project_name: "",
         year:"",
       },
+      isCheckedProjectWiseFund:false,
       totalFunding: 0,
       totalProject: 0,
       totalEmployee: 0,
       knowledgeProduct: 0,
       totalMou: 0,
+
+      financeList: [],
+      lastAmtDate: "",
+      lastAmtReceived: "",
+      totalReceivedAmt: "",
+      balanceAmt: "",
+      amountAllocatedTillDate: 0,
+      expenditureTillDate: 0,
 
       //series: [44, 55, 13, 43, 22],
       series: [],
@@ -175,7 +185,9 @@ class WelcomePage extends Component {
     };
     this.handleChange = this.handleChange.bind(this);
     this.reloadDashboard = this.reloadDashboard.bind(this);
-
+    this.handleCheckboxChange = this.handleCheckboxChange.bind(this);
+    this.formattedNumber = this.formattedNumber.bind(this);
+    this.myfunction = this.myfunction.bind(this);
   }
 
    // set state year, all center, all Project
@@ -184,6 +196,51 @@ class WelcomePage extends Component {
     filterData[e.target.name] = e.target.value;
     this.setState({ filterData: filterData });
   }
+
+   handleCheckboxChange = async() => {
+    let thizz = this;
+   await this.setState((prevState) => ({
+      isCheckedProjectWiseFund: !prevState.isCheckedProjectWiseFund, // Toggle the checkbox state
+    }));
+    let myObj ={
+      isChecked: thizz.state.isCheckedProjectWiseFund
+    }
+    axios({
+      method: "post",
+      url: process.env.REACT_APP_BASE_URL + "/api/landing-page/project-wise-funding",
+      data: myObj
+    }).then((response)=> {
+      var actualResp = response.data;
+      if (actualResp.FundingAgency) {
+        let newOptions = {
+          chart: {
+            width: 380,
+            type: 'pie',
+          },
+          labels: actualResp.FundingAgency,
+          responsive: [{
+            breakpoint: 480,
+            options: {
+              chart: {
+                width: 200,
+              },
+              legend: {
+                position: 'bottom'
+              }
+            }
+          }]
+        }
+        thizz.setState({ options: newOptions })
+      }
+      if (actualResp.FundingAmt) {
+        thizz.setState({ series: actualResp.FundingAmt })
+      }
+    }).catch((err)=> {
+      console.log(err);
+    })
+
+
+  };
 
 
   reloadDashboard() {
@@ -203,6 +260,29 @@ class WelcomePage extends Component {
 
   }
 
+  myfunction() {
+    let allocatedFund = 0;
+    for (var i = 0; i < this.state.financeList.length; i++) {
+      allocatedFund += parseInt(this.state.financeList[i].allocated_fund);
+      console.log(allocatedFund)
+    }
+    // return allocatedFund
+    let remaningFund = (this.state.balanceAmt / allocatedFund) * 100
+    remaningFund = (Math.round(remaningFund * 100) / 100).toFixed(2);
+    // return remaningFund
+    if (5 < remaningFund) {
+      return "Invoice due within 3 month"
+    } else if (2 < remaningFund && 5 > remaningFund) {
+      return "Invoice due next month"
+    } else if (0.5 <= remaningFund && 2 > remaningFund) {
+      return "Invoice due next week"
+    } else if (0.5 > remaningFund) {
+      return "Invoice due next day"
+    }
+
+  }
+
+
   dashboard(thizz) {
     // axios.post(process.env.REACT_APP_BASE_URL + "/api/landing-page")
     axios({
@@ -218,7 +298,14 @@ class WelcomePage extends Component {
 
       this.setState({
         centre: centre,
-        project: project
+        project: project,
+        financeList: response.data.budgetList,
+        totalReceivedAmt: response.data.totalReceivedAmt,
+        lastAmtReceived: response.data.lastAmtReceived,
+        lastAmtDate: response.data.lastAmtDate,
+        balanceAmt: response.data.balanceAmt,
+        amountAllocatedTillDate: response.data.amountTillDate,
+        expenditureTillDate: response.data.utilizedAmt
       })
 
       var actualResp = response.data;
@@ -379,7 +466,12 @@ class WelcomePage extends Component {
       console.log(error.response.data)
     })
   }
+ formattedNumber(val) {
+    const formattedValue =  parseInt(val).toLocaleString(); 
+    return formattedValue;
+  }
 
+  
   render() {
 
     let centre = this.state.centre.map(function (center, index) {
@@ -390,6 +482,7 @@ class WelcomePage extends Component {
       return <option key={project.id} value={project.project_code}>{project.project_name}</option>;
 
     })
+    
 
     return (
       <>
@@ -477,7 +570,7 @@ class WelcomePage extends Component {
               </div>
             </div>
 
-            <div className="row ">
+           
               <div className="col-md-12 mb-1">
                 <button className="btn btn-dark border-dark ml-4  mr-2 p-2"> Summary </button>
                 <button className="btn border-dark mr-2 p-2"> Budget Head
@@ -485,13 +578,20 @@ class WelcomePage extends Component {
                 <button className="btn border-dark mr-2 p-2"> Invoice </button>
                 <button className="btn border-dark mr-2 p-2"> Deficits </button>
               </div>
-
+              {/* Summary */}
+             
+              <div className="row ">
               <div className="col-md-6">
                 <div className="header-container card">
                   <div className="icon">
                     <i className="fa fa-bar-chart faChart" aria-hidden="true"></i>
                   </div>
-                  <h4 className="header"> Overall Fund</h4> <span style={{ float: "right", marginTop: "10px" }}> <input type="checkbox" /> <lable> Project Wise Funding</lable> </span>
+                  <h4 className="header"> Overall Fund</h4>
+                   <span style={{ float: "right", marginTop: "10px" }}> 
+                    <input type="checkbox" checked={this.state.isCheckedProjectWiseFund} onChange={this.handleCheckboxChange}
+/> 
+                    <lable> Project Wise Funding</lable>
+                   </span>
                   <Chart options={this.state.options} series={this.state.series} type="pie" style={{ height: "315px" }} />
                 </div>
               </div>
@@ -505,6 +605,138 @@ class WelcomePage extends Component {
                 </div>
               </div>
             </div>
+             {/* End Summary */}
+            {/* Budget Head */}
+            <div className="row">
+                <div className="col-md-12 card">
+                  <table class="table">
+                    <thead>
+                      <tr>
+                        <th scope="col"> S.no </th>
+                        <th scope="col"> Budget Head </th>
+                        <th scope="col"> Total Fund Allocated </th>
+                        <th scope="col"> Total Amout Received </th>
+                        <th scope="col"> Total Expenditure </th>
+                        <th scope="col"> Utilization(%) </th>
+
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {this.state.financeList.map((item, index) => (
+                        <tr key={index}>
+                          <th scope="row"> {index + 1}</th>
+                          <td>{item.budget_head.toUpperCase()}</td>
+                          <td>{this.formattedNumber(item.allocated_fund)}</td>
+                          <td> {this.formattedNumber((index === 2) ? this.state.totalReceivedAmt : '')} </td>
+                          <td>{this.formattedNumber(item.expenditure ? item.expenditure : 0)}</td>
+                          <td> {Math.round((item.expenditure / item.allocated_fund) * 100)}% </td>
+                        </tr>
+                      ))}
+
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            {/* End Budget Head */}
+
+            {/* Invoice */}
+            <div className="row">
+                <div className="col-sm-3">
+                  <div className="card bg-primary">
+                  <div className="card-header">
+                    
+                    <small className="font-weight-bold"> Amount Allocated Till Date </small>
+                  </div>
+                    <div className="card-body">
+                      <h5 className="card-title"> {this.formattedNumber(this.state.amountAllocatedTillDate)} </h5>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="col-sm-3">
+                  <div className="card bg-success">
+                  <div className="card-header">
+                  
+                  <small className="font-weight-bold"> Amount Received Till Date </small>
+                  </div>
+                    <div className="card-body">
+                      <h5 className="card-title"> {this.formattedNumber(this.state.totalReceivedAmt)} </h5>
+                    </div>
+                  </div>
+                </div>
+
+
+                <div className="col-sm-3">
+                  <div className="card bg-orange">
+                  <div className="card-header">
+                  <small className="font-weight-bold text-white">
+                    Amount Yet To Be Received
+                    </small>
+                  </div>
+                    <div className="card-body">
+                      <h5 className="card-title text-white"> {this.formattedNumber(this.state.amountAllocatedTillDate - this.state.totalReceivedAmt)} </h5>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="col-sm-3">
+                  <div className="card bg-warning">
+                  <div className="card-header">
+                  <small className="font-weight-bold text-white"> Expenditure Till Date </small> 
+                  </div>
+                    <div className="card-body">
+                      <h5 className="card-title text-white"> {this.formattedNumber(this.state.expenditureTillDate)} </h5>
+                    </div>
+                  </div>
+                </div>
+                  
+                <div className="col-sm-3">
+                  <div className="card bg-danger">
+                  <div className="card-header">
+                  <small className="font-weight-bold"> Fund Surplus/ Deficit </small>
+                  </div>
+                    <div className="card-body">
+                      <h5 className="card-title"> {this.formattedNumber(this.state.balanceAmt)} </h5>
+                    </div>
+                  </div>
+                </div>
+               
+                <div className="col-sm-3">
+                  <div className="card bg-olive">
+                  <div className="card-header">
+                  <small className="font-weight-bold"> Last Received Amount </small>
+                  </div>
+                    <div className="card-body">
+                      <h5 className="card-title"> {this.formattedNumber(this.state.lastAmtReceived)} </h5>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="col-sm-3">
+                  <div className="card bg-gradient-purple">
+                  <div className="card-header">
+                  <small className="font-weight-bold"> Last Received Amount Date </small>
+                  </div>
+                    <div className="card-body">
+                      <h5 className="card-title"> {moment(this.state.lastAmtDate).format("DD-MM-YYYY")} </h5>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="col-sm-3">
+                  <div className="card bg-danger">
+                  <div className="card-header">
+                  <small className="font-weight-bold"> Status / Invoice Date </small>
+                  </div>
+                    <div className="card-body">
+                      <h5 className="card-title"> {this.myfunction()} </h5>
+                    </div>
+                  </div>
+                </div>
+              
+               
+              </div>
+            {/* End Invoice */}
 
             <h2 className="bg-info mb-3" style={{ textAlign: "center" }}> Finances </h2>
 

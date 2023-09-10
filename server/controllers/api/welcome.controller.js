@@ -124,7 +124,7 @@ async function overView(req, res, next) {
       inner JOIN project_plan as pp
       ON t.project_plan_id = pp.id ${whereString}`,
         { type: db.QueryTypes.SELECT });
-        
+
       if (customObj) {
         totalEmployee = customObj[0].cnt
       }
@@ -150,6 +150,7 @@ async function overView(req, res, next) {
     if (req.body.project_name) {
       whereOfProjectActivityTask.project_name = req.body.project_name
     }
+
     let totalKnowledgeProducts = 0;
     let knowledgeProduct = await ProjectMasterActivity.findOne({
       where: {
@@ -171,7 +172,7 @@ async function overView(req, res, next) {
         whereString += ' and pp.centre_name =' + whereOfProjectActivityTask.centre_name
       }
       if (whereOfProjectActivityTask.project_name) {
-        whereString += ' and pp.project_name =' + whereOfProjectActivityTask.centre_name
+        whereString += ' and pp.project_name =' + whereOfProjectActivityTask.project_name
       }
       let customObj = await db.query(`SELECT count(t.id) as cnt FROM project_activity_tasks as t
       inner JOIN project_activity as pa on pa.id=t.project_activity_id
@@ -188,13 +189,62 @@ async function overView(req, res, next) {
       totalKnowledgeProducts = 0
     }
 
-    let totalMou = await ProjectActivityTask.count({
-      distinct: true,
-      col: 'task',
+    // ---------------------
+
+    let whereOfProjectActivityTaskMou = {}
+    if (req.body.centre_name) {
+      whereOfProjectActivityTaskMou.centre_name = req.body.centre_name
+    }
+
+    if (req.body.project_name) {
+      whereOfProjectActivityTaskMou.project_name = req.body.project_name
+    }
+
+    let totalMou = 0;
+    let mouProduct = await ProjectMasterActivity.findOne({
       where: {
-        project_activity_id: 28,
+        name: 'MOUs/Agreements'
       }
-    });
+    })
+    if (Object.keys(whereOfProjectActivityTaskMou).length === 0) {
+      let customObj = await db.query(`SELECT count(t.id) as cnt FROM project_activity_tasks  as t
+      inner JOIN project_activity as pa on pa.id=t.project_activity_id
+      inner JOIN project_plan as pp
+      ON t.project_plan_id = pp.id where pa.project_master_activity_id = ${mouProduct.id}`,
+        { type: db.QueryTypes.SELECT });
+      if (customObj) {
+        totalMou = customObj[0].cnt
+      }
+    } else {
+      var whereString = 'where pa.project_master_activity_id =  ' + knowledgeProduct.id + ' ';
+      if (whereOfProjectActivityTaskMou.centre_name) {
+        whereString += ' and pp.centre_name =' + whereOfProjectActivityTaskMou.centre_name
+      }
+      if (whereOfProjectActivityTaskMou.project_name) {
+        whereString += ' and pp.project_name =' + whereOfProjectActivityTaskMou.project_name
+      }
+      let customObj = await db.query(`SELECT count(t.id) as cnt FROM project_activity_tasks as t
+      inner JOIN project_activity as pa on pa.id=t.project_activity_id
+      inner JOIN project_plan as pp
+      ON t.project_plan_id = pp.id ${whereString}`,
+        { type: db.QueryTypes.SELECT });
+      if (customObj) {
+        totalMou = customObj[0].cnt
+      }
+    }
+
+
+    if (!totalMou) {
+      totalMou = 0
+    }
+
+    // let totalMou = await ProjectActivityTask.count({
+    //   distinct: true,
+    //   col: 'task',
+    //   where: {
+    //     project_activity_id: 28,
+    //   }
+    // });
 
     // Get all funding details for pie graph
     const FundingAgancyDetails = await db.query(`SELECT * FROM project_plan as pp left JOIN funding_agency as fa ON pp.funding_agency = fa.agency_code`,
@@ -304,6 +354,20 @@ async function overView(req, res, next) {
       }
     }
 
+    let budgetList = await db.query(`SELECT project_plan_id,budget_head, sum(allocated_fund) as allocated_fund , SUM(expenditure)as expenditure FROM finances GROUP by budget_head`, { type: db.QueryTypes.SELECT });
+    const receivedAmt = await db.query(`SELECT sum(fr.amount_recieved) as amount_recieved
+    FROM finance_recieved as fr INNER JOIN project_plan AS pr ON pr.id=fr.project_plan_id
+     where (fr.is_adjustment is null or fr.is_adjustment = false)`,
+      { type: db.QueryTypes.SELECT });
+      const utilizedAmt = await db.query(`SELECT sum(fr.expenditure) as expenditure FROM finances as fr INNER JOIN project_plan AS pr ON pr.id=fr.project_plan_id
+      `,
+        { type: db.QueryTypes.SELECT });
+
+      const data = await db.query(`SELECT max(amount_recieved)as amount_recieved ,max(amount_recieved_date)as amount_recieved_date FROM finance_recieved WHERE is_adjustment !=1`,
+      { type: db.QueryTypes.SELECT });
+
+    const amountTillDate = await db.query(`SELECT sum(allocated_fund)as allocated_fund FROM finances WHERE year < (SELECT year(CURRENT_DATE))`,
+      { type: db.QueryTypes.SELECT });
     return res.status(200).json({
       status: true,
       "centres": centres,
@@ -317,9 +381,18 @@ async function overView(req, res, next) {
       "FundingAmt": fundingAmt,
       //second graph for welcome page
       projectList: projectList,
+      "budgetList": budgetList,
+      totalReceivedAmt: receivedAmt[0].amount_recieved,
+      balanceAmt: receivedAmt[0].amount_recieved - utilizedAmt[0].expenditure,
+      lastAmtReceived: data[0].amount_recieved,
+      lastAmtDate: data[0].amount_recieved_date,
+      amountTillDate: amountTillDate[0].allocated_fund,
+      utilizedAmt: utilizedAmt[0].expenditure,
       "sanctionFund": sanctionFund,
       "releasedFund": releasedFund,
       "utilizationFund": utilizationFund,
+      "balanceAmt": receivedAmt[0].amount_recieved - utilizedAmt[0].expenditure,
+      "utilizedAmt": utilizedAmt[0].expenditure,
       //2nd row graph
       "projectActivity": customObj,
       "projectActivity2": customObj2,
@@ -336,7 +409,47 @@ async function overView(req, res, next) {
   }
 }
 
+async function projectWiseFunding(req, res, next) {
+  let isChecked = req.body.isChecked;
+  let fundingAgency = [];
+  let fundingAmt = [];
+  if (isChecked) {
+    const FundingAgancyDetails = await db.query(`SELECT pp.centre_name as centre_code, pp.project_name as project_code, pp.funding_agency, pp.allocated_budget, p.project_name FROM project_plan as pp inner JOIN project as p ON pp.project_name = p.project_code`,
+      { type: db.QueryTypes.SELECT });
+
+    //bind data according to Overall Fund graph
+    for (let i = 0; i < FundingAgancyDetails.length; i++) {
+      let agency = FundingAgancyDetails[i];
+      fundingAgency.push(agency.project_name);
+      fundingAmt.push(agency.allocated_budget);
+    }
+    return res.status(200).json({
+      status: true,
+      "FundingAgency": fundingAgency,
+      "FundingAmt": fundingAmt,
+    })
+
+
+  } else {
+    const FundingAgancyDetails = await db.query(`SELECT * FROM project_plan as pp left JOIN funding_agency as fa ON pp.funding_agency = fa.agency_code`,
+      { type: db.QueryTypes.SELECT });
+
+    //bind data according to Overall Fund graph
+    for (let i = 0; i < FundingAgancyDetails.length; i++) {
+      let agency = FundingAgancyDetails[i];
+      fundingAgency.push(agency.agency_name);
+      fundingAmt.push(agency.allocated_budget);
+    }
+
+    return res.status(200).json({
+      status: true,
+      "FundingAgency": fundingAgency,
+      "FundingAmt": fundingAmt,
+    })
+  }
+}
 
 module.exports = {
-  overView
+  overView,
+  projectWiseFunding
 }

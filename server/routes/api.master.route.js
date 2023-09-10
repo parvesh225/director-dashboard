@@ -60,6 +60,7 @@ router.post('/admin/fetch-finances-by-year-project',projectPlanController.savePr
 
 //Frontend
 router.post('/landing-page', welcomePageController.overView);
+router.post('/landing-page/project-wise-funding', welcomePageController.projectWiseFunding);
 router.get('/admin/overall-dashboard/:id',overallDashboardController.overallDashboard);
 router.get('/project-activity-graph/:id/:year?',overallDashboardController.projectActivityGraph);
 router.get('/admin/project-finance-details/:id',overallDashboardController.fundingDetail);

@@ -64,7 +64,7 @@ async function fundingDetail(req, res, next) {
     let projectId = req.params.id;
     const finaceList = await db.query(`SELECT project_plan_id,budget_head, sum(allocated_fund) as allocated_fund , SUM(expenditure)as expenditure  FROM finances GROUP by budget_head HAVING project_plan_id=${projectId}`, { type: db.QueryTypes.SELECT });
 
-    const receivedAmt = await db.query(`SELECT sum(fr.amount_recieved) as amount_recieved
+    const amountReceivedTillDate = await db.query(`SELECT sum(fr.amount_recieved) as amount_recieved
   FROM finance_recieved as fr INNER JOIN project_plan AS pr ON pr.id=fr.project_plan_id
    where (fr.is_adjustment is null or fr.is_adjustment = false)`,
       { type: db.QueryTypes.SELECT });
